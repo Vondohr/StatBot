@@ -101,12 +101,13 @@ class DateChanger(commands.Cog):
                 monthName = "x"
                 todayOrder = 0
 
-        channelID = 1372560402319409152  # Replace with your actual channel ID
+        channelID = 1372302555304169573
         channel = self.bot.get_channel(channelID)
         
         if channel:
             try:
-                await channel.edit(name=f"「📅」{dayName}《{monthDay}-{monthName}┃{monthDay}-{monthNumber}┃{todayOrder}》")
+                if channel.name != f"「📅」{dayName}《{monthDay}-{monthName}┃{monthDay}-{monthNumber}┃{todayOrder}》":
+                    await channel.edit(name=f"「📅」{dayName}《{monthDay}-{monthName}┃{monthDay}-{monthNumber}┃{todayOrder}》")
             except Exception as e:
                 print(f"Failed to update channel name: {e}")
         else:

@@ -12,7 +12,7 @@ class DateChanger(commands.Cog):
     def cog_unload(self):
         self.dateFinder.cancel()
 
-    @tasks.loop(minutes=11)
+    @tasks.loop(hours=1)
     async def dateFinder(self):
         currentYear = datetime.date.today().year
         today = datetime.date.today()

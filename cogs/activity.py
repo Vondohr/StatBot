@@ -13,10 +13,10 @@ class ActivityTracker(commands.Cog):
             return
 
         # Example: print to console
-        if message.channel.category.name == "Text Channels":
-            print(f"[{message.guild.name}] #{message.channel.name} - {message.author}: {message.content}")
-        else:
-            print("Message not in the Text Channels category")
+        # if message.channel.category.name == "Text Channels":
+        #    print(f"[{message.guild.name}] #{message.channel.name} - {message.author}: {message.content}")
+        # else:
+            # print("Message not in the Text Channels category")
 
         # You can also log this to a file or a database
         # with open("message_log.txt", "a", encoding="utf-8") as f:

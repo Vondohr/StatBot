@@ -5,7 +5,7 @@ from typing import Literal
 
 class ButtonView(discord.ui.View):
     def __init__(self, factions, planet_role):
-        super().__init__(timeout=10)
+        super().__init__(timeout=86400)
 
         if factions == "Rebels vs Empire":
             label1 = "Rebels"
@@ -17,52 +17,61 @@ class ButtonView(discord.ui.View):
             label1 = "Hutts"
             label2 = "Imperials"
 
-        button1 = discord.ui.Button(label=label1, style=discord.ButtonStyle.primary)
+        button1 = discord.ui.Button(label=label1, style=discord.ButtonStyle.red)
         async def button1_callback(interaction: discord.Interaction):
             target_roles = ["Rebels", "Imperials", "Hutts"]
             user_roles = [role.name for role in interaction.user.roles]
 
+            member = interaction.guild.get_member(interaction.user.id)
+            if not discord.utils.get(member.roles, id=1261788616527708181):
+                await interaction.response.send_message("You are not in any Crew!", ephemeral=True)
+                return
+
             if any(role in user_roles for role in target_roles):
-                await interaction.response.send_message("You have already joined the fight!", ephemeral=True)
+                await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} aid your faction!**", ephemeral=True)
                 return
             
             role_name = button1.label
             guild = interaction.guild
             member = interaction.user
             role = discord.utils.get(guild.roles, name=role_name)
+            planet = discord.utils.get(guild.roles, name=planet_role)
 
             if role:
-                await member.add_roles(role)
-                await member.add_roles(planet_role)
-                await interaction.response.send_message(f"You've been assigned the **{role.name}** role!", ephemeral=True)
+                await member.add_roles(role, planet)
+                await interaction.response.send_message(f"You are now fighting for the **{role.name}**!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
             else:
-                await interaction.response.send_message(f"Role **{role_name}** not found.", ephemeral=True)
+                await interaction.response.send_message(f"Role **{role_name}** not found. Contact the mods!", ephemeral=True)
             
         button1.callback = button1_callback
         self.add_item(button1)
 
         # Button 2
-        button2 = discord.ui.Button(label=label2, style=discord.ButtonStyle.primary)
+        button2 = discord.ui.Button(label=label2, style=discord.ButtonStyle.red)
         async def button2_callback(interaction: discord.Interaction):
             target_roles = ["Rebels", "Imperials", "Hutts"]
             user_roles = [role.name for role in interaction.user.roles]
 
+            member = interaction.guild.get_member(interaction.user.id)
+            if not discord.utils.get(member.roles, id=1261788616527708181):
+                await interaction.response.send_message("You are not in any Crew!", ephemeral=True)
+                return
+
             if any(role in user_roles for role in target_roles):
-                await interaction.response.send_message("You have already joined the fight!", ephemeral=True)
+                await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
                 return
 
             role_name = button2.label
             guild = interaction.guild
             member = interaction.user
             role = discord.utils.get(guild.roles, name=role_name)
+            planet = discord.utils.get(guild.roles, name=planet_role)
 
             if role:
-                print(planet_role)
-                await member.add_roles(role)
-                await member.add_roles(planet_role)
-                await interaction.response.send_message(f"You've been assigned the **{role.name}** role!", ephemeral=True)
+                await member.add_roles(role, planet)
+                await interaction.response.send_message(f"You are now fighting for the **{role.name}**!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
             else:
-                await interaction.response.send_message(f"Role **{role_name}** not found.", ephemeral=True)
+                await interaction.response.send_message(f"Role **{role_name}** not found. Contact the mods!", ephemeral=True)
 
         button2.callback = button2_callback
         self.add_item(button2)
@@ -103,9 +112,10 @@ class EmbedSender(commands.Cog):
             embed = discord.Embed(
                 title=f"Battle on {planet_role}!",
                 description="Mercenaries needed!\n\n**Pick a side and join the fight!**",
-                color=discord.Color.green()
+                color=discord.Color.brand_red(),
             )
             embed.set_image(url="https://www.techspot.com/articles-info/1095/images/2015-11-21-image.gif")
+            embed.set_footer(text="You can only join the fight for the next 24 hours!")
 
             view = ButtonView(factions, planet_role)
             message = await channel.send(embed=embed, view=view)

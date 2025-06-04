@@ -127,7 +127,7 @@ class EmbedSender(commands.Cog):
             channel = interaction.guild.get_channel(channel_id_int)
 
             if factions == "The Draeth":
-                descriptionText = "Bounty Hunter's Guild hub is under attack!\n\n**Join the fight!**"
+                descriptionText = "Bounty Hunter's Guild hub is under attack by **The Draeth!**\n\n**Join the fight!**"
             else:
                 descriptionText = "Mercenaries needed!\n\n**Pick a side and join the fight!**"
             

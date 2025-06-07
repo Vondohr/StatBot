@@ -103,14 +103,15 @@ class ButtonView(discord.ui.View):
             except Exception as e:
                 print(f"Failed to disable buttons: {e}")
 
-class EmbedSender(commands.Cog):
+class EmbedEndBattleSender(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="admin_send_battle_invite", description="Send a battle invitation embed with buttons to choose a side.")
-    @app_commands.describe(planet_role="The role of the planet or moon where the battle is happening")
-    @app_commands.describe(factions="Choose factions that are fighting")
-    async def send_embed(self, interaction: discord.Interaction, planet_role: str, factions: Literal["Rebels vs Empire", "Rebels vs Hutts", "Hutts vs Empire", "Empire vs Czerkans", "Czerkans vs Hutts", "Czerkans vs Rebels", "The Draeth"]):
+    @app_commands.command(name="admin_end_battle", description="Ends a battle event.")
+    @app_commands.describe(planet_role="The role of the planet or moon where the battle happened")
+    @app_commands.describe(winning_faction="The Faction that won the battle")
+    @app_commands.describe(losing_faction="The Faction that lost the battle")
+    async def send_embed(self, interaction: discord.Interaction, planet_role: str, winning_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters"], losing_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters"]):
         member = interaction.guild.get_member(interaction.user.id)
         if not discord.utils.get(member.roles, id=1260298617818841318):
                 await interaction.response.send_message("You are not an Admin!", ephemeral=True)
@@ -136,10 +137,7 @@ class EmbedSender(commands.Cog):
                 description=descriptionText,
                 color=discord.Color.brand_red(),
             )
-            if factions == "The Draeth":
-                embed.set_image(url="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGFmcm5laTFvbWNncTVudGU5MnA2ZXNyM2FpNG14MzhwZzUzZGxrMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9hCnOTQMC4hXNoKzZ6/giphy.gif")
-            else:
-                embed.set_image(url="https://www.techspot.com/articles-info/1095/images/2015-11-21-image.gif")
+            embed.set_image(url="https://www.techspot.com/articles-info/1095/images/2015-11-21-image.gif")
             embed.set_footer(text="You can only join the fight for the next 24 hours!")
 
             view = ButtonView(factions, planet_role)
@@ -152,4 +150,4 @@ class EmbedSender(commands.Cog):
             await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
 
 async def setup(bot):
-    await bot.add_cog(EmbedSender(bot))
+    await bot.add_cog(EmbedEndBattleSender(bot))

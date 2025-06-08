@@ -4,6 +4,24 @@ from discord import app_commands
 from discord.ext import commands
 from typing import Literal
 
+# Define allowed destinations as choices for the command
+valid_destinations = [
+    "Planet Carajam",
+    "Planet Kashyyyk",
+    "Planet Tatooine",
+    "Planet Naboo",
+    "Planet Nal Hutta",
+    "Moon Nar Shaddaa",
+    "Planet Ryloth",
+    "Planet Ord Mantell",
+    "Planet Lothal",
+    "Planet Cantonica",
+    "Planet Bracca",
+    "Moon Jedha",
+    "Planet Alderaan",
+    "Planet Coruscant"
+]
+
 class EmbedEndBattleSender(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -24,14 +42,6 @@ class EmbedEndBattleSender(commands.Cog):
 
         if not role_planet:
             await interaction.response.send_message("Not a valid planet role!", ephemeral=True)
-            return
-        
-        if not role_winning:
-            await interaction.response.send_message("Not a valid winning role!", ephemeral=True)
-            return
-        
-        if not role_losing:
-            await interaction.response.send_message("Not a valid losing role!", ephemeral=True)
             return
         
         if winning_faction == losing_faction:
@@ -72,7 +82,8 @@ class EmbedEndBattleSender(commands.Cog):
         # Add a message to everyone regarding the winning / losing faction
 
         # Wait for 2 hours (7200 seconds)
-        await asyncio.sleep(7200)
+        # await asyncio.sleep(7200)
+        await asyncio.sleep(5)
 
         members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
         if not members_planet:
@@ -117,6 +128,14 @@ class EmbedEndBattleSender(commands.Cog):
         except ValueError:
             await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
         '''
+
+    # Define choices for location in the jump command
+    @send_embed.autocomplete("planet_role")
+    async def send_embed_autocomplete(self, interaction: discord.Interaction, current: str):
+        return [
+            discord.app_commands.Choice(name=dest, value=dest)
+            for dest in valid_destinations if current.lower() in dest.lower()
+        ][:25]  # Limit to 25 choices, the maximum for Discord
             
 async def setup(bot):
     await bot.add_cog(EmbedEndBattleSender(bot))

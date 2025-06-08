@@ -35,7 +35,7 @@ class ButtonView(discord.ui.View):
             label1 = "Hutts"
             label2 = "Imperials"
         elif factions == "Empire vs Czerkans":
-            label1 = "Empire"
+            label1 = "Imperials"
             label2 = "Czerkans"
         elif factions == "Czerkans vs Hutts":
             label1 = "Czerkans"

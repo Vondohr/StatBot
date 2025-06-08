@@ -76,7 +76,7 @@ class EmbedEndBattleSender(commands.Cog):
         if members_planet:
             await interaction.channel.send(f"Removing '{role_planet}' role from {len(members_planet)} member(s).")
 
-            for member in members_losing:
+            for member in members_planet:
                 try:
                     location_roles = [role for role in member.roles if role.name.startswith(("Planet", "Moon"))]
                     if len(location_roles) > 1:

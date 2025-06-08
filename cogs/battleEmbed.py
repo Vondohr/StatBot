@@ -59,7 +59,7 @@ class ButtonView(discord.ui.View):
                     return
 
             if any(role in user_roles for role in target_roles):
-                await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} aid your faction!**", ephemeral=True)
+                await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
                 return
             
             if button1.label == "Fight!":

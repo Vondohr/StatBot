@@ -40,48 +40,48 @@ class EmbedEndBattleSender(commands.Cog):
         role_winning = discord.utils.get(interaction.guild.roles, name=winning_faction)
         role_losing = discord.utils.get(interaction.guild.roles, name=losing_faction)
 
+        interaction.response.send_message("Beginning the roles removal.", ephemeral=True)
+
         if not role_planet:
-            await interaction.response.send_message("Not a valid planet role!", ephemeral=True)
+            await interaction.followup.send("Not a valid planet role!", ephemeral=True)
             return
         
         if winning_faction == losing_faction:
-            await interaction.response.send_message("The winning faction cannot be the same as the losing faction!", ephemeral=True)
+            await interaction.followup.send("The winning faction cannot be the same as the losing faction!", ephemeral=True)
             return
 
         if not role_winning == "The Draeth":
             members_winning = [member for member in interaction.guild.members if role_winning in member.roles]
             if not members_winning:
-                await interaction.response.send_message(f"Nobody has the {role_winning} role.", ephemeral=True)
+                await interaction.followup.send(f"Nobody has the {role_winning} role.", ephemeral=True)
             else:
-                await interaction.response.send_message(f"Removing '{role_winning}' role from {len(members_winning)} member(s).", ephemeral=True)
+                await interaction.followup.send(f"Removing '{role_winning}' role from {len(members_winning)} member(s).", ephemeral=True)
 
                 for member in members_winning:
                     try:
                         await member.remove_roles(role_winning)
                     except discord.Forbidden:
-                        await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+                        await interaction.followup.send(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
                 
-                await interaction.response.send_message(f"Finished removing the '{role_winning}' role from all applicable members.", ephemeral=True)
+                await interaction.followup.send(f"Finished removing the '{role_winning}' role from all applicable members.", ephemeral=True)
         
 
         if not role_losing == "The Draeth":
             members_losing = [member for member in interaction.guild.members if role_losing in member.roles]
             if not members_losing:
-                await interaction.response.send_message(f"Nobody has the {role_losing} role.", ephemeral=True)
+                await interaction.followup.send(f"Nobody has the {role_losing} role.", ephemeral=True)
             else:
-                await interaction.response.send_message(f"Removing '{role_losing}' role from {len(members_losing)} member(s).", ephemeral=True)
+                await interaction.followup.send(f"Removing '{role_losing}' role from {len(members_losing)} member(s).", ephemeral=True)
 
                 for member in members_losing:
                     try:
                         await member.remove_roles(role_losing)
                     except discord.Forbidden:
-                        await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+                        await interaction.followup.send(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
                 
-                await interaction.response.send_message(f"Finished removing the '{role_losing}' role from all applicable members.", ephemeral=True)
+                await interaction.followup.send(f"Finished removing the '{role_losing}' role from all applicable members.", ephemeral=True)
         
         # Add a message to everyone regarding the winning / losing faction
-
-        interaction.response.send_message(f"The winning faction: '{role_winning}'!")
 
         # Wait for 2 hours (7200 seconds)
         # await asyncio.sleep(7200)
@@ -89,9 +89,9 @@ class EmbedEndBattleSender(commands.Cog):
 
         members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
         if not members_planet:
-            await interaction.response.send_message(f"Nobody has the {role_planet} role.", ephemeral=True)
+            await interaction.followup.send(f"Nobody has the {role_planet} role.", ephemeral=True)
         else:
-            await interaction.response.send_message(f"Removing '{role_planet}' role from {len(members_planet)} member(s).", ephemeral=True)
+            await interaction.followup.send(f"Removing '{role_planet}' role from {len(members_planet)} member(s).", ephemeral=True)
 
             for member in members_losing:
                 try:
@@ -99,9 +99,9 @@ class EmbedEndBattleSender(commands.Cog):
                     if len(location_roles) > 1:
                         await member.remove_roles(role_planet)
                 except discord.Forbidden:
-                    await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+                    await interaction.followup.send(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
             
-            await interaction.response.send_message(f"Finished removing the '{role_planet}' role from all applicable members.", ephemeral=True)
+            await interaction.followup.send(f"Finished removing the '{role_planet}' role from all applicable members.", ephemeral=True)
 
         '''
         try:

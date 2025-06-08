@@ -131,7 +131,7 @@ class EmbedEndBattleSender(commands.Cog):
             await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
         '''
 
-    # Define choices for location in the jump command
+    # Define choices for location in the battle command
     @send_embed.autocomplete("planet_role")
     async def send_embed_autocomplete(self, interaction: discord.Interaction, current: str):
         return [

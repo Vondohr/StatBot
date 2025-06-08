@@ -3,6 +3,24 @@ from discord import app_commands
 from discord.ext import commands
 from typing import Literal
 
+# Define allowed destinations as choices for the command
+valid_destinations = [
+    "Planet Carajam",
+    "Planet Kashyyyk",
+    "Planet Tatooine",
+    "Planet Naboo",
+    "Planet Nal Hutta",
+    "Moon Nar Shaddaa",
+    "Planet Ryloth",
+    "Planet Ord Mantell",
+    "Planet Lothal",
+    "Planet Cantonica",
+    "Planet Bracca",
+    "Moon Jedha",
+    "Planet Alderaan",
+    "Planet Coruscant"
+]
+
 class ButtonView(discord.ui.View):
     def __init__(self, factions, planet_role):
         super().__init__(timeout=86400)
@@ -151,6 +169,14 @@ class EmbedSender(commands.Cog):
 
         except ValueError:
             await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
+
+    # Define choices for location in the battle command
+    @send_embed.autocomplete("planet_role")
+    async def send_embed_autocomplete(self, interaction: discord.Interaction, current: str):
+        return [
+            discord.app_commands.Choice(name=dest, value=dest)
+            for dest in valid_destinations if current.lower() in dest.lower()
+        ][:25]  # Limit to 25 choices, the maximum for Discord
 
 async def setup(bot):
     await bot.add_cog(EmbedSender(bot))

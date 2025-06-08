@@ -36,8 +36,9 @@ class ButtonView(discord.ui.View):
 
             member = interaction.guild.get_member(interaction.user.id)
             if not discord.utils.get(member.roles, id=1261788616527708181):
-                await interaction.response.send_message("You are not in any Crew!", ephemeral=True)
-                return
+                if not discord.utils.get(member.roles, id=1292841133835292702):
+                    await interaction.response.send_message("You cannot take part in Battles yet! Find a Crew or create a Character!", ephemeral=True)
+                    return
 
             if any(role in user_roles for role in target_roles):
                 await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} aid your faction!**", ephemeral=True)
@@ -107,7 +108,7 @@ class EmbedSender(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="admin_send_battle_invite", description="Send a battle invitation embed with buttons to choose a side.")
+    @app_commands.command(name="admin_send_battle_invite", description="Send a battle invitation embed with buttons to choose a side. Current channel will be used.")
     @app_commands.describe(planet_role="The role of the planet or moon where the battle is happening")
     @app_commands.describe(factions="Choose factions that are fighting")
     async def send_embed(self, interaction: discord.Interaction, planet_role: str, factions: Literal["Rebels vs Empire", "Rebels vs Hutts", "Hutts vs Empire", "Empire vs Czerkans", "Czerkans vs Hutts", "Czerkans vs Rebels", "The Draeth"]):
@@ -123,7 +124,7 @@ class EmbedSender(commands.Cog):
             return
 
         try:
-            channel_id_int = int(1260348000316817501)
+            channel_id_int = int(interaction.channel_id)
             channel = interaction.guild.get_channel(channel_id_int)
 
             if factions == "The Draeth":

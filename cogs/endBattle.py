@@ -1,130 +1,98 @@
 import discord
+import asyncio
 from discord import app_commands
 from discord.ext import commands
 from typing import Literal
-
-class ButtonView(discord.ui.View):
-    def __init__(self, factions, planet_role):
-        super().__init__(timeout=86400)
-
-        if factions == "Rebels vs Empire":
-            label1 = "Rebels"
-            label2 = "Imperials"
-        elif factions == "Rebels vs Hutts":
-            label1 = "Rebels"
-            label2 = "Hutts"
-        elif factions == "Hutts vs Empire":
-            label1 = "Hutts"
-            label2 = "Imperials"
-        elif factions == "Empire vs Czerkans":
-            label1 = "Empire"
-            label2 = "Czerkans"
-        elif factions == "Czerkans vs Hutts":
-            label1 = "Czerkans"
-            label2 = "Hutts"
-        elif factions == "Czerkans vs Rebels":
-            label1 = "Czerkans"
-            label2 = "Rebels"
-        elif factions == "The Draeth":
-            label1 = "Fight!"
-            label2 = "EMPTY"
-
-        button1 = discord.ui.Button(label=label1, style=discord.ButtonStyle.red)
-        async def button1_callback(interaction: discord.Interaction):
-            target_roles = ["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters"]
-            user_roles = [role.name for role in interaction.user.roles]
-
-            member = interaction.guild.get_member(interaction.user.id)
-            if not discord.utils.get(member.roles, id=1261788616527708181):
-                await interaction.response.send_message("You are not in any Crew!", ephemeral=True)
-                return
-
-            if any(role in user_roles for role in target_roles):
-                await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} aid your faction!**", ephemeral=True)
-                return
-            
-            if button1.label == "Fight!":
-                role_name = "Hunters"
-            else:
-                role_name = button1.label
-            
-            guild = interaction.guild
-            member = interaction.user
-            role = discord.utils.get(guild.roles, name=role_name)
-            planet = discord.utils.get(guild.roles, name=planet_role)
-
-            if role:
-                await member.add_roles(role, planet)
-                await interaction.response.send_message(f"You are now fighting for the **{role.name}**!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
-            else:
-                await interaction.response.send_message(f"Role **{role_name}** not found. Contact the mods!", ephemeral=True)
-            
-        button1.callback = button1_callback
-        self.add_item(button1)
-
-        if not label2 == "EMPTY":
-            # Button 2
-            button2 = discord.ui.Button(label=label2, style=discord.ButtonStyle.red)
-            async def button2_callback(interaction: discord.Interaction):
-                target_roles = ["Rebels", "Imperials", "Hutts", "Czerkans"]
-                user_roles = [role.name for role in interaction.user.roles]
-
-                member = interaction.guild.get_member(interaction.user.id)
-                if not discord.utils.get(member.roles, id=1261788616527708181):
-                    await interaction.response.send_message("You are not in any Crew!", ephemeral=True)
-                    return
-
-                if any(role in user_roles for role in target_roles):
-                    await interaction.response.send_message(f"You have already joined the fight!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
-                    return
-
-                role_name = button2.label
-                guild = interaction.guild
-                member = interaction.user
-                role = discord.utils.get(guild.roles, name=role_name)
-                planet = discord.utils.get(guild.roles, name=planet_role)
-
-                if role:
-                    await member.add_roles(role, planet)
-                    await interaction.response.send_message(f"You are now fighting for the **{role.name}**!\n\n**Go to {planet_role} to aid your faction!**", ephemeral=True)
-                else:
-                    await interaction.response.send_message(f"Role **{role_name}** not found. Contact the mods!", ephemeral=True)
-
-            button2.callback = button2_callback
-            self.add_item(button2)
-
-    async def on_timeout(self):
-            for item in self.children:
-                if isinstance(item, discord.ui.Button):
-                    item.disabled = True
-
-            try:
-                await self.message.edit(view=self)
-            except Exception as e:
-                print(f"Failed to disable buttons: {e}")
 
 class EmbedEndBattleSender(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="admin_end_battle", description="Ends a battle event.")
+    @app_commands.command(name="admin_end_battle", description="Ends a battle event embed to the current channel.")
     @app_commands.describe(planet_role="The role of the planet or moon where the battle happened")
     @app_commands.describe(winning_faction="The Faction that won the battle")
     @app_commands.describe(losing_faction="The Faction that lost the battle")
-    async def send_embed(self, interaction: discord.Interaction, planet_role: str, winning_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters"], losing_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters"]):
+    async def send_embed(self, interaction: discord.Interaction, planet_role: str, winning_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters", "The Draeth"], losing_faction: Literal["Rebels", "Imperials", "Hutts", "Czerkans", "Hunters", "The Draeth"]):
         member = interaction.guild.get_member(interaction.user.id)
         if not discord.utils.get(member.roles, id=1260298617818841318):
                 await interaction.response.send_message("You are not an Admin!", ephemeral=True)
                 return
     
-        role = discord.utils.get(interaction.guild.roles, name=planet_role)
+        role_planet = discord.utils.get(interaction.guild.roles, name=planet_role)
+        role_winning = discord.utils.get(interaction.guild.roles, name=winning_faction)
+        role_losing = discord.utils.get(interaction.guild.roles, name=losing_faction)
 
-        if not role:
-            await interaction.response.send_message("Not a valid role!", ephemeral=True)
+        if not role_planet:
+            await interaction.response.send_message("Not a valid planet role!", ephemeral=True)
+            return
+        
+        if not role_winning:
+            await interaction.response.send_message("Not a valid winning role!", ephemeral=True)
+            return
+        
+        if not role_losing:
+            await interaction.response.send_message("Not a valid losing role!", ephemeral=True)
+            return
+        
+        if winning_faction == losing_faction:
+            await interaction.response.send_message("The winning faction cannot be the same as the losing faction!", ephemeral=True)
             return
 
+        if not role_winning == "The Draeth":
+            members_winning = [member for member in interaction.guild.members if role_winning in member.roles]
+            if not members_winning:
+                await interaction.response.send_message(f"Nobody has the {role_winning} role.", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Removing '{role_winning}' role from {len(members_winning)} member(s).", ephemeral=True)
+
+                for member in members_winning:
+                    try:
+                        await member.remove_roles(role_winning)
+                    except discord.Forbidden:
+                        await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+                
+                await interaction.response.send_message(f"Finished removing the '{role_winning}' role from all applicable members.", ephemeral=True)
+        
+
+        if not role_losing == "The Draeth":
+            members_losing = [member for member in interaction.guild.members if role_losing in member.roles]
+            if not members_losing:
+                await interaction.response.send_message(f"Nobody has the {role_losing} role.", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Removing '{role_losing}' role from {len(members_losing)} member(s).", ephemeral=True)
+
+                for member in members_losing:
+                    try:
+                        await member.remove_roles(role_losing)
+                    except discord.Forbidden:
+                        await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+                
+                await interaction.response.send_message(f"Finished removing the '{role_losing}' role from all applicable members.", ephemeral=True)
+        
+        # Add a message to everyone regarding the winning / losing faction
+
+        # Wait for 2 hours (7200 seconds)
+        await asyncio.sleep(7200)
+
+        members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
+        if not members_planet:
+            await interaction.response.send_message(f"Nobody has the {role_planet} role.", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Removing '{role_planet}' role from {len(members_planet)} member(s).", ephemeral=True)
+
+            for member in members_losing:
+                try:
+                    location_roles = [role for role in member.roles if role.name.startswith(("Planet", "Moon"))]
+                    if len(location_roles) > 1:
+                        await member.remove_roles(role_planet)
+                except discord.Forbidden:
+                    await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
+            
+            await interaction.response.send_message(f"Finished removing the '{role_planet}' role from all applicable members.", ephemeral=True)
+
+        '''
         try:
-            channel_id_int = int(1260348000316817501)
+            channel_id_int = int(interaction.channel_id)
             channel = interaction.guild.get_channel(channel_id_int)
 
             if factions == "The Draeth":
@@ -148,6 +116,7 @@ class EmbedEndBattleSender(commands.Cog):
 
         except ValueError:
             await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
-
+        '''
+            
 async def setup(bot):
     await bot.add_cog(EmbedEndBattleSender(bot))

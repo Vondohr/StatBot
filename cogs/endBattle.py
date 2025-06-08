@@ -81,6 +81,8 @@ class EmbedEndBattleSender(commands.Cog):
         
         # Add a message to everyone regarding the winning / losing faction
 
+        interaction.response.send_message(f"The winning faction: '{role_winning}'!")
+
         # Wait for 2 hours (7200 seconds)
         # await asyncio.sleep(7200)
         await asyncio.sleep(5)

@@ -47,7 +47,7 @@ class EmbedEndBattleSender(commands.Cog):
         if not role_winning == "The Draeth":
             members_winning = [member for member in interaction.guild.members if role_winning in member.roles]
             if members_winning:
-                await interaction.channel.send(f"Removing '{role_winning}' role from {len(members_winning)} member(s).")
+                await interaction.channel.send(f"(*Removing '{role_winning}' role from {len(members_winning)} member(s).*)")
 
                 for member in members_winning:
                     try:
@@ -58,7 +58,7 @@ class EmbedEndBattleSender(commands.Cog):
         if not role_losing == "The Draeth":
             members_losing = [member for member in interaction.guild.members if role_losing in member.roles]
             if members_losing:
-                await interaction.channel.send(f"Removing '{role_losing}' role from {len(members_losing)} member(s).")
+                await interaction.channel.send(f"(*Removing '{role_losing}' role from {len(members_losing)} member(s).*)")
 
                 for member in members_losing:
                     try:
@@ -66,24 +66,6 @@ class EmbedEndBattleSender(commands.Cog):
                     except discord.Forbidden:
                         await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
         
-        # Add a message to everyone regarding the winning / losing faction
-
-        # Wait for 2 hours (7200 seconds)
-        # await asyncio.sleep(7200)
-        await asyncio.sleep(5)
-
-        members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
-        if members_planet:
-            await interaction.channel.send(f"Removing '{role_planet}' role from {len(members_planet)} member(s).")
-
-            for member in members_planet:
-                try:
-                    location_roles = [role for role in member.roles if role.name.startswith(("Planet", "Moon"))]
-                    if len(location_roles) > 1:
-                        await member.remove_roles(role_planet)
-                except discord.Forbidden:
-                    await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
-
         embed = discord.Embed(
                 title=f"Battle on {planet_role} ended! Winning side: {winning_faction}",
                 description=f"Losing side: {losing_faction}",
@@ -105,6 +87,22 @@ class EmbedEndBattleSender(commands.Cog):
         embed.set_footer(text="This location will get inaccessible for you in 2 hours.")
 
         await interaction.channel.send(embed=embed)
+
+        # Wait for 2 hours (7200 seconds)
+        # await asyncio.sleep(7200)
+        await asyncio.sleep(10)
+
+        members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
+        if members_planet:
+            await interaction.channel.send(f"*Shuttles arrive to take everyone away from '{role_planet}'.*")
+
+            for member in members_planet:
+                try:
+                    location_roles = [role for role in member.roles if role.name.startswith(("Planet", "Moon"))]
+                    if len(location_roles) > 1:
+                        await member.remove_roles(role_planet)
+                except discord.Forbidden:
+                    await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
 
     # Define choices for location in the battle command
     @send_embed.autocomplete("planet_role")

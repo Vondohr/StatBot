@@ -84,33 +84,27 @@ class EmbedEndBattleSender(commands.Cog):
                 except discord.Forbidden:
                     await interaction.response.send_message(f"Missing permissions to remove role from {member.display_name}", ephemeral=True)
 
-        '''
-        try:
-            channel_id_int = int(interaction.channel_id)
-            channel = interaction.guild.get_channel(channel_id_int)
-
-            if factions == "The Draeth":
-                descriptionText = "Bounty Hunter's Guild hub is under attack by **The Draeth!**\n\n**Join the fight!**"
-            else:
-                descriptionText = "Mercenaries needed!\n\n**Pick a side and join the fight!**"
-            
-            embed = discord.Embed(
-                title=f"Battle on {planet_role}!",
-                description=descriptionText,
-                color=discord.Color.brand_red(),
+        embed = discord.Embed(
+                title=f"Battle on {planet_role} ended! Winning side: {winning_faction}",
+                description=f"Losing side: {losing_faction}",
+                color=discord.Color.dark_gold(),
             )
-            embed.set_image(url="https://www.techspot.com/articles-info/1095/images/2015-11-21-image.gif")
-            embed.set_footer(text="You can only join the fight for the next 24 hours!")
+        embed.set_image(url="https://pa1.aminoapps.com/6813/24c6a2c1f792538227c5c664a45611265c46fc6a_hq.gif")
+        if winning_faction == "Rebels":
+            embed.set_thumbnail(url="https://www.nicepng.com/png/full/200-2009186_rebel-alliance-star-wars-rebel-logo.png")
+        elif winning_faction == "Imperials":
+            embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/0/0d/Red_emblem_of_the_First_Galactic_Empire.png")
+        elif winning_faction == "Hutts":
+            embed.set_thumbnail(url="https://static.wikia.nocookie.net/star-wars-expanded-universe-holocron/images/4/4b/Hutt_Symbol.png")
+        elif winning_faction == "Czerkans":
+            embed.set_thumbnail(url="https://static.wikia.nocookie.net/oppressive-games-power/images/9/99/Czerka1.png")
+        elif winning_faction == "Hunters":
+            embed.set_thumbnail(url="https://images.seeklogo.com/logo-png/48/2/star-wars-mandalorian-mythosaur-skull-logo-png_seeklogo-484140.png")
+        elif winning_faction == "The Draeth":
+            embed.set_thumbnail(url="https://lumiere-a.akamaihd.net/v1/images/image_4aaef442.png")
+        embed.set_footer(text="This location will get inaccessible for you in 2 hours.")
 
-            view = ButtonView(factions, planet_role)
-            message = await channel.send(embed=embed, view=view)
-            view.message = message
-
-            await interaction.response.send_message(f"Embed sent to {channel.mention}.", ephemeral=True)
-
-        except ValueError:
-            await interaction.response.send_message("Please provide a valid numeric channel ID.", ephemeral=True)
-        '''
+        await interaction.channel.send(embed=embed)
 
     # Define choices for location in the battle command
     @send_embed.autocomplete("planet_role")

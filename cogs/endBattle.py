@@ -93,7 +93,7 @@ class EmbedEndBattleSender(commands.Cog):
 
         members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
         if members_planet:
-            await interaction.channel.send(f"*Shuttles arrive to take everyone away from '{role_planet}'.*")
+            await interaction.channel.send(f"*Shuttles arrive to take everyone away from {role_planet}.*")
 
             for member in members_planet:
                 try:

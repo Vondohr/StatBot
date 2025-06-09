@@ -89,8 +89,7 @@ class EmbedEndBattleSender(commands.Cog):
         await interaction.channel.send(embed=embed)
 
         # Wait for 2 hours (7200 seconds)
-        # await asyncio.sleep(7200)
-        await asyncio.sleep(10)
+        await asyncio.sleep(7200)
 
         members_planet = [member for member in interaction.guild.members if role_planet in member.roles]
         if members_planet:

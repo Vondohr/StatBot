@@ -146,9 +146,9 @@ class EmbedSender(commands.Cog):
             channel = interaction.guild.get_channel(channel_id_int)
 
             if factions == "The Draeth":
-                descriptionText = "Bounty Hunter's Guild hub is under attack by **The Draeth!**\n\n**Join the fight!**\n\n**Reward**\n400 ᖬ\n\nDuration of the event\n2 days (expected)"
+                descriptionText = "Bounty Hunter's Guild hub is under attack by **The Draeth!**\n\n**Reward**\n400 ᖬ\n\n**Duration of the event**\n2 days (expected)\n\n**Join the fight!**"
             else:
-                descriptionText = "Mercenaries needed!\n\n**Pick a side and join the fight!**\n\n**Reward**\n400 ᖬ\n\nDuration of the event\n2 days (expected)"
+                descriptionText = "Mercenaries needed!\n\n**Reward**\n400 ᖬ\n\n**Duration of the event**\n2 days (expected)\n\n**Pick a side and join the fight!**"
             
             embed = discord.Embed(
                 title=f"Battle on {planet_role}!",

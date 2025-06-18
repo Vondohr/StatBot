@@ -9,7 +9,7 @@ class EmbedCreator(commands.Cog):
     @app_commands.command(name="admin_embed_create", description="Create a custom embed")
     @app_commands.describe(
         title="Title of the embed",
-        description="Main body text",
+        description="Main body text. \ n (without space) for a new line",
         footer="Footer text",
         thumbnail="Thumbnail URL",
         image="Main image URL"
@@ -45,7 +45,7 @@ class EmbedCreator(commands.Cog):
         channel="Channel where the message is located",
         message_id="ID of the message to edit",
         title="New title",
-        description="New description",
+        description="New description. \ n (without space) for a new line",
         footer="New footer",
         thumbnail="New thumbnail URL",
         image="New image URL"

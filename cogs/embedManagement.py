@@ -6,7 +6,7 @@ class EmbedCreator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="embed_create", description="Create a custom embed")
+    @app_commands.command(name="admin_embed_create", description="Create a custom embed")
     @app_commands.describe(
         title="Title of the embed",
         description="Main body text",
@@ -40,7 +40,7 @@ class EmbedCreator(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="embed_edit", description="Edit an existing embed message")
+    @app_commands.command(name="admin_embed_edit", description="Edit an existing embed message")
     @app_commands.describe(
         channel="Channel where the message is located",
         message_id="ID of the message to edit",

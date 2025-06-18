@@ -30,9 +30,9 @@ class EmbedCreator(commands.Cog):
         if title:
             embed.title = title
         if description:
-            embed.description = description
+            embed.description = description.replace("\\n", "\n")
         if footer:
-            embed.set_footer(text=footer)
+            embed.set_footer(text=footer.replace("\\n", "\n"))
         if thumbnail:
             embed.set_thumbnail(url=thumbnail)
         if image:
@@ -79,12 +79,12 @@ class EmbedCreator(commands.Cog):
                 new_embed.title = embed['title']
 
             if description:
-                new_embed.description = description
+                new_embed.description = description.replace("\\n", "\n")
             elif 'description' in embed:
                 new_embed.description = embed['description']
 
             if footer:
-                new_embed.set_footer(text=footer)
+                new_embed.set_footer(text=footer.replace("\\n", "\n"))
             elif 'footer' in embed:
                 new_embed.set_footer(text=embed['footer']['text'])
 

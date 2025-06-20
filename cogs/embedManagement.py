@@ -41,14 +41,6 @@ class EmbedCreator(commands.Cog):
         await interaction.response.send_message("Embed posted!", ephemeral=True)
         await interaction.channel.send(embed=embed)
 
-        dm_message = ("**Your Bounty Hunter character has been approved!**\n\n"
-                    
-                    f"1. Please change your nickname on the server to **\"{title}\"**.\n\n"
-
-                    "2. Head over to the **[Purchasing Guide](https://discord.com/channels/1258379465919041589/1276474859018391615)** to continue getting your Character ready.")
-
-        await member.send(dm_message)
-
     @app_commands.command(name="admin_embed_edit", description="Edit an existing embed message")
     @app_commands.describe(
         channel="Channel where the message is located",

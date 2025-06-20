@@ -43,6 +43,9 @@ class EmbedCreator(commands.Cog):
 
         dm_message = (
                     "Your Bounty Hunter character has been approved! Please change your nickname on the server to."
+
+                    "[Watch our Opening Crawl!](https://www.youtube.com/watch?v=TVDm77NpEXI)"
+
                     "Head over to the [Purchasing Guide](https://discord.com/channels/1258379465919041589/1276474859018391615) to continue getting your Character ready."
                 )
 

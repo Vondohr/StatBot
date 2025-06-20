@@ -38,7 +38,7 @@ class EmbedCreator(commands.Cog):
         if image:
             embed.set_image(url=image)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.channel.send(embed=embed)
 
     @app_commands.command(name="admin_embed_edit", description="Edit an existing embed message")
     @app_commands.describe(

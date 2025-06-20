@@ -41,7 +41,7 @@ class EmbedCreator(commands.Cog):
         await interaction.response.send_message("Embed posted!", ephemeral=True)
         await interaction.channel.send(embed=embed)
 
-        file = discord.File("OpeningCrawlBeginning.mp4", filename="OpeningCrawlBeginning.mp4")
+        file = discord.File("./files/OpeningCrawlBeginning.mp4", filename="OpeningCrawlBeginning.mp4")
         await interaction.channel.send("Here is the video:", file=file)
 
     @app_commands.command(name="admin_embed_edit", description="Edit an existing embed message")

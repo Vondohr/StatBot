@@ -12,21 +12,31 @@ class EmbedCreator(commands.Cog):
         description="Main body text. \ n (without space) for a new line",
         footer="Footer text",
         thumbnail="Thumbnail URL",
-        image="Main image URL"
+        image="Main image URL",
+        color="Hex color code (e.g. #FF0000)"
     )
     async def embed_create(self, interaction: discord.Interaction,
-                           title: str = None,
-                           description: str = None,
-                           footer: str = None,
-                           thumbnail: str = None,
-                           image: str = None):
+                            title: str = None,
+                            description: str = None,
+                            footer: str = None,
+                            thumbnail: str = None,
+                            image: str = None,
+                            color: str = None):
 
         member = interaction.guild.get_member(interaction.user.id)
         if not discord.utils.get(member.roles, id=1260298617818841318):
                 await interaction.response.send_message("You are not an Admin!", ephemeral=True)
                 return
 
-        embed = discord.Embed()
+        embed_color = discord.Color.default()
+        if color:
+            try:
+                embed_color = discord.Color(int(color.strip("#"), 16))
+            except ValueError:
+                await interaction.response.send_message("Invalid hex color code. Use format like #FF0000.", ephemeral=True)
+                return
+
+        embed = discord.Embed(color=embed_color)
         if title:
             embed.title = title
         if description:
@@ -49,7 +59,8 @@ class EmbedCreator(commands.Cog):
         description="New description. \ n (without space) for a new line",
         footer="New footer",
         thumbnail="New thumbnail URL",
-        image="New image URL"
+        image="New image URL",
+        color="New hex color code (e.g. #00FF00)"
     )
     async def embed_edit(self, interaction: discord.Interaction,
                          channel: discord.TextChannel,
@@ -58,7 +69,8 @@ class EmbedCreator(commands.Cog):
                          description: str = None,
                          footer: str = None,
                          thumbnail: str = None,
-                         image: str = None):
+                         image: str = None,
+                         color: str = None):
 
         member = interaction.guild.get_member(interaction.user.id)
         if not discord.utils.get(member.roles, id=1260298617818841318):
@@ -73,6 +85,17 @@ class EmbedCreator(commands.Cog):
 
             embed = message.embeds[0].to_dict()
             new_embed = discord.Embed()
+
+            if color:
+                try:
+                    embed_color = discord.Color(int(color.strip("#"), 16))
+                except ValueError:
+                    await interaction.response.send_message("Invalid hex color code. Use format like #00FF00.", ephemeral=True)
+                    return
+            elif 'color' in embed:
+                embed_color = discord.Color(embed['color'])
+
+            new_embed = discord.Embed(color=embed_color)
 
             if title:
                 new_embed.title = title

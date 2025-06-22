@@ -1,0 +1,35 @@
+import discord
+from discord.ext import commands
+
+class RoleAdder(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(name='addplayerrole')
+    @commands.has_permissions(manage_roles=True)
+    async def add_player_role(self, ctx):
+        """Adds the 'Player' role to all members who have the 'Crew' role."""
+        guild = ctx.guild
+        crew_role = discord.utils.get(guild.roles, name="Crew")
+        player_role = discord.utils.get(guild.roles, name="Player")
+
+        if not crew_role or not player_role:
+            await ctx.send("One or both roles ('Crew', 'Player') not found.")
+            return
+
+        count = 0
+        failed = 0
+
+        for member in guild.members:
+            if crew_role in member.roles and player_role not in member.roles:
+                try:
+                    await member.add_roles(player_role)
+                    count += 1
+                except Exception as e:
+                    failed += 1
+                    print(f"Error adding role to {member.display_name}: {e}")
+
+        await ctx.send(f"✅ Added 'Player' role to {count} members. ❌ Failed for {failed}.")
+
+async def setup(bot):
+    await bot.add_cog(RoleAdder(bot))

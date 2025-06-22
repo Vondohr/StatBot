@@ -37,5 +37,5 @@ class RoleAdder(commands.Cog):
 
         await interaction.followup.send(f"✅ Added 'Player' role to {count} members. ❌ Failed for {failed}.", ephemeral=True)
 
-async def setup(bot: commands.Bot):
+async def setup(bot):
     await bot.add_cog(RoleAdder(bot))

@@ -95,6 +95,7 @@ class Shuttle(commands.Cog):
 
         await interaction.response.send_message(embed=embed, view=cancel_view)
         message = await interaction.original_response()
+        await cancel_view.wait()
         cancel_view.message = message
 
         if cancel_view.cancelled:
@@ -147,7 +148,8 @@ class Shuttle(commands.Cog):
             return
 
         target_thread = None
-        async for thread in forum_channel.threads():
+        threads = await forum_channel.threads()
+        for thread in threads:
             if "🚀" in thread.name:
                 target_thread = thread
                 break

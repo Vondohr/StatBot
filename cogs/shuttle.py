@@ -109,11 +109,8 @@ class Shuttle(commands.Cog):
 
         # Remove all planet/moon roles
         for role in member.roles:
-            if any(role.name.startswith(prefix) for prefix in VALID_PREFIXES):
-                try:
-                    await member.remove_roles(role)
-                except Exception:
-                    pass
+            if role.name.startswith("Planet") or role.name.startswith("Moon"):
+                await member.remove_roles(role)
 
         # Wait the travel duration
         await asyncio.sleep(shuttle_duration * 60)

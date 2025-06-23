@@ -24,7 +24,7 @@ class CancelButton(discord.ui.View):
         self.message = None
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user.id:
             await interaction.response.send_message("This button isn't for you.", ephemeral=True)
             return

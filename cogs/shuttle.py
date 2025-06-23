@@ -78,7 +78,7 @@ class Shuttle(commands.Cog):
             await interaction.response.send_message("You are not allowed to call for a Shuttle!", ephemeral=True)
             return
 
-        if not any(role.name == "Crew" for role in interaction.user.roles):
+        if any(role.name == "Crew" for role in interaction.user.roles):
             await interaction.response.send_message("You are not allowed to use Shuttles! Jump with your own ship.", ephemeral=True)
             return
 
@@ -98,7 +98,7 @@ class Shuttle(commands.Cog):
         )
         embed.set_image(url="https://64.media.tumblr.com/eaeefa3884095ca9c7b7e44b2752693e/eec4ede0fa31de36-5b/s540x810/d8cbdb39737d68d577ac1dab12a9f1c9e52b83f2.gif")
 
-        await interaction.response.send_message(embed=embed, view=cancel_view, ephemeral=True)
+        await interaction.response.send_message(embed=embed, view=cancel_view)
         await cancel_view.wait()
 
         if cancel_view.cancelled:

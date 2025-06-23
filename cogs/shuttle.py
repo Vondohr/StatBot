@@ -21,7 +21,7 @@ class CancelButton(discord.ui.View):
         super().__init__(timeout=WAIT_BEFORE_REVOKE)
         self.user = user
         self.cancelled = False
-        self.message = None  # We'll store the message object later
+        self.message = None
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -30,10 +30,13 @@ class CancelButton(discord.ui.View):
             return
         self.cancelled = True
         self.disable_all_items()
+
         try:
             await interaction.response.edit_message(content="🚫 Shuttle cancelled.", view=self)
-        except discord.HTTPException:
+        except discord.InteractionResponded:
             pass
+        except Exception as e:
+            print(f"Error editing message after cancel: {e}")
         self.stop()
 
     async def on_timeout(self):
@@ -41,8 +44,8 @@ class CancelButton(discord.ui.View):
         try:
             if self.message:
                 await self.message.edit(view=self)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error disabling buttons after timeout: {e}")
 
 class Shuttle(commands.Cog):
     def __init__(self, bot):
@@ -84,15 +87,15 @@ class Shuttle(commands.Cog):
         cancel_view = CancelButton(interaction.user)
 
         embed = discord.Embed(
-            title="🚀 Shuttle Launch Sequence Initiated",
+            title=f"🚀 Shuttle Launch Sequence Initiated for {interaction.user.nick}",
             description=f"Destination: **{location}**\n\nThe shuttle will arrive in 5 minutes. Click **Cancel** to abort.\n\nFlight duration: `{shuttle_duration}` minutes.",
             color=discord.Color.dark_gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/eaeefa3884095ca9c7b7e44b2752693e/eec4ede0fa31de36-5b/s540x810/d8cbdb39737d68d577ac1dab12a9f1c9e52b83f2.gif")
 
         await interaction.response.send_message(embed=embed, view=cancel_view)
-        cancel_view.message = await interaction.original_response()
-        await cancel_view.wait()
+        message = await interaction.original_response()
+        cancel_view.message = message
 
         if cancel_view.cancelled:
             active_shuttles.discard(user_id)
@@ -126,12 +129,13 @@ class Shuttle(commands.Cog):
             active_shuttles.discard(user_id)
             return
 
-        destination = self.extract_destination(location)
-        if not destination:
+        destinationLong = self.extract_destination(location)
+        if not destinationLong:
             await interaction.followup.send("Invalid role format.", ephemeral=True)
             active_shuttles.discard(user_id)
             return
 
+        destination = destinationLong.replace(" ", "-")
         forum_channel = discord.utils.find(
             lambda c: isinstance(c, discord.ForumChannel) and destination.lower() in c.name.lower(),
             interaction.guild.channels

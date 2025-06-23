@@ -95,7 +95,7 @@ class Shuttle(commands.Cog):
 
         await interaction.response.send_message(embed=embed, view=cancel_view)
         message = await interaction.original_response()
-        await cancel_view.wait()
+        # await cancel_view.wait()
         cancel_view.message = message
 
         if cancel_view.cancelled:
@@ -136,7 +136,7 @@ class Shuttle(commands.Cog):
             active_shuttles.discard(user_id)
             return
 
-        destination = destinationLong.replace(" ", "-")
+        destination = destinationLong.replace(" ", "-") # For planets with multiple words in the name, like "Nal Hutta"
         forum_channel = discord.utils.find(
             lambda c: isinstance(c, discord.ForumChannel) and destination.lower() in c.name.lower(),
             interaction.guild.channels

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 from discord.ui import View, Button
 import subprocess
 import asyncio
@@ -82,7 +83,7 @@ class InkCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="playstory")
+    @app_commands.command(name="playstory", description="Play the story.")
     async def playstory(self, ctx):
         session = InkSession()
         lines = await session.get_next()

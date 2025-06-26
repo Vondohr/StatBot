@@ -92,7 +92,8 @@ class InkCog(commands.Cog):
         text = "\n".join(line for line in lines if not line.startswith("["))
 
         view = InkView(session, lines)
-        await interaction.channel.send(content=text, view=view)
+        await view.refresh_buttons(lines)
+        await interaction.response.send_message(content=text, view=view)
 
 async def setup(bot):
     await bot.add_cog(InkCog(bot))

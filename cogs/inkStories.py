@@ -18,16 +18,23 @@ class InkSession:
         self.output_lines = []
 
     async def get_next(self):
-        """Read lines until choices appear."""
+        """Read all lines and all choices without prematurely stopping."""
         self.output_lines = []
         while True:
             line = self.proc.stdout.readline()
-            if line == '':
+            if not line:
                 break
+
             line = line.strip()
             self.output_lines.append(line)
-            if line.startswith("[0]") or "===END===" in line:
+
+            # Wait a moment after a choice line to let all of them print
+            if line.startswith("[") and "]" in line:
+                await asyncio.sleep(0.05)
+
+            if "===END===" in line:
                 break
+
         return self.output_lines
 
     def send_choice(self, index: int):

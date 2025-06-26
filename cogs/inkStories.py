@@ -10,38 +10,29 @@ class InkSession:
         self.process = None
 
     async def start_process(self):
-        # Start the node story_runner.js subprocess asynchronously
         self.process = await asyncio.create_subprocess_exec(
             "node", "./story_runner.js",
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            text=True
+            # no text=True here
         )
 
     async def get_next(self):
-        """
-        Read all output lines from the subprocess until choices and/or END marker appear.
-        Returns a list of output lines (strings).
-        """
         lines = []
 
         while True:
-            # Read line asynchronously with a timeout
             try:
-                line = await asyncio.wait_for(self.process.stdout.readline(), timeout=5)
+                line_bytes = await asyncio.wait_for(self.process.stdout.readline(), timeout=5)
             except asyncio.TimeoutError:
-                # No more output for 5 seconds — assume story ended or stuck
                 break
 
-            if not line:
-                # EOF reached
+            if not line_bytes:
                 break
 
-            line = line.strip()
+            line = line_bytes.decode('utf-8').strip()  # decode bytes to str
             lines.append(line)
 
-            # Wait briefly if line looks like a choice to gather all choices
             if line.startswith("[") and "]" in line:
                 await asyncio.sleep(0.05)
 
@@ -51,14 +42,9 @@ class InkSession:
         return lines
 
     async def send_choice(self, index: int):
-        # Send the choice index to the subprocess stdin asynchronously
-        self.process.stdin.write(f"{index}\n")
+        choice_str = f"{index}\n"
+        self.process.stdin.write(choice_str.encode('utf-8'))  # encode string to bytes
         await self.process.stdin.drain()
-
-    async def is_finished(self):
-        # Check if the last read lines contained the end marker
-        # This should be called after get_next()
-        return any("===END===" in line for line in await self.get_next())
 
     async def terminate(self):
         if self.process:

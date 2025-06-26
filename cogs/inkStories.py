@@ -84,7 +84,7 @@ class InkCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="playstory", description="Play the story.")
-    async def playstory(self, ctx):
+    async def playstory(self, interaction: discord.Interaction):
         session = InkSession()
         lines = await session.get_next()
         text = "\n".join(line for line in lines if not line.startswith("["))

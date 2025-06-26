@@ -23,8 +23,7 @@ async def load():
 
 async def main():
     async with bot:
-        # await load()
-        await bot.load_extension("ink_adventure")
+        await load()
         await bot.start(token)
 
 asyncio.run(main())

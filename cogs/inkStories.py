@@ -15,7 +15,6 @@ class InkSession:
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            # no text=True here
         )
 
     async def get_next(self):
@@ -30,7 +29,7 @@ class InkSession:
             if not line_bytes:
                 break
 
-            line = line_bytes.decode('utf-8').strip()  # decode bytes to str
+            line = line_bytes.decode('utf-8').strip()
             lines.append(line)
 
             if line.startswith("[") and "]" in line:
@@ -43,7 +42,7 @@ class InkSession:
 
     async def send_choice(self, index: int):
         choice_str = f"{index}\n"
-        self.process.stdin.write(choice_str.encode('utf-8'))  # encode string to bytes
+        self.process.stdin.write(choice_str.encode('utf-8'))
         await self.process.stdin.drain()
 
     async def terminate(self):
@@ -64,7 +63,6 @@ class ChoiceButton(Button):
     async def callback(self, interaction: discord.Interaction):
         try:
             await self.session.send_choice(self.index)
-            # Small pause to let node process choice
             await asyncio.sleep(0.1)
             lines = await self.session.get_next()
 
@@ -74,33 +72,36 @@ class ChoiceButton(Button):
                 return
 
             new_text = "\n".join(line for line in lines if not line.startswith("["))
-            self.parent_view.clear_items()
-            for line in lines:
-                if line.startswith("["):
-                    idx = int(line[1])
-                    label = line.split("] ", 1)[1]
-                    self.parent_view.add_item(ChoiceButton(label, idx, self.session, self.parent_view))
-
+            self.parent_view.update_buttons(lines)
             await interaction.response.edit_message(content=new_text, view=self.parent_view)
 
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc()
-            await interaction.response.send_message(f"❌ Error:\n```\n{tb}\n```", ephemeral=False)
+            await interaction.response.send_message(f"❌ Error:\n```\n{tb}\n```", ephemeral=True)
             await self.session.terminate()
 
 class InkView(View):
-    def __init__(self, session, initial_lines):
-        super().__init__(timeout=None)
+    def __init__(self, session, lines):
+        super().__init__(timeout=300)  # Optional timeout, e.g. 5 minutes
         self.session = session
-        self.initial_lines = initial_lines
+        self.update_buttons(lines)
 
-    async def refresh_buttons(self, lines):
+    def update_buttons(self, lines):
         self.clear_items()
         for line in lines:
             if line.startswith("["):
                 idx = int(line[1])
                 label = line.split("] ", 1)[1]
                 self.add_item(ChoiceButton(label, idx, self.session, self))
+
+    async def on_timeout(self):
+        # Clean up process on timeout
+        await self.session.terminate()
+        # Optionally disable all buttons when view times out:
+        for child in self.children:
+            child.disabled = True
+        # Edit message to disable buttons (you might want to pass the message reference here)
+        # But here we just rely on timeout cleanup
 
 class InkCog(commands.Cog):
     def __init__(self, bot):
@@ -120,10 +121,9 @@ class InkCog(commands.Cog):
 
             text = "\n".join(line for line in lines if not line.startswith("["))
             view = InkView(session, lines)
-            await view.refresh_buttons(lines)
             await interaction.followup.send(content=text, view=view)
 
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc()
             await interaction.followup.send(f"❌ Error during story start:\n```\n{tb}\n```", ephemeral=False)
             await session.terminate()

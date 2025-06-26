@@ -90,7 +90,7 @@ class InkCog(commands.Cog):
         text = "\n".join(line for line in lines if not line.startswith("["))
 
         view = InkView(session, lines)
-        await ctx.send(content=text, view=view)
+        await interaction.channel.send(content=text, view=view)
 
 async def setup(bot):
     await bot.add_cog(InkCog(bot))

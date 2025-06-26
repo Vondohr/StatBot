@@ -19,26 +19,25 @@ class InkSession:
 
     async def get_next(self):
         lines = []
-
         while True:
             try:
-                line_bytes = await asyncio.wait_for(self.process.stdout.readline(), timeout=5)
+                line_bytes = await asyncio.wait_for(self.process.stdout.readline(), timeout=2)
             except asyncio.TimeoutError:
-                break
+                break  # No more lines after timeout = end of this story beat
 
             if not line_bytes:
-                break
+                break  # Process closed?
 
-            line = line_bytes.decode('utf-8').strip()
-            lines.append(line)
+            line = line_bytes.decode("utf-8").strip()
+            if line:
+                lines.append(line)
 
-            if line.startswith("[") and "]" in line:
-                await asyncio.sleep(0.05)
-
+            # End signal
             if "===END===" in line:
                 break
 
         return lines
+
 
     async def send_choice(self, index: int):
         choice_str = f"{index}\n"

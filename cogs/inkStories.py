@@ -73,11 +73,13 @@ class InkView(View):
         self.session = session
         self.initial_lines = initial_lines
 
-        for line in initial_lines:
+    async def refresh_buttons(self, lines):
+        self.clear_items()
+        for line in lines:
             if line.startswith("["):
                 idx = int(line[1])
                 label = line.split("] ", 1)[1]
-                self.add_item(ChoiceButton(label, idx, session, self))
+                self.add_item(ChoiceButton(label, idx, self.session, self))
 
 class InkCog(commands.Cog):
     def __init__(self, bot):

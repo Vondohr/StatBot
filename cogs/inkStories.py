@@ -2,60 +2,71 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, Button
-import subprocess
 import asyncio
 import traceback
 
 class InkSession:
     def __init__(self):
-        self.proc = subprocess.Popen(
-            ["node", "./story_runner.js"],  # Ensure relative path is correct
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
+        self.process = None
+
+    async def start_process(self):
+        # Start the node story_runner.js subprocess asynchronously
+        self.process = await asyncio.create_subprocess_exec(
+            "node", "./story_runner.js",
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            text=True
         )
-        self.output_lines = []
 
     async def get_next(self):
-        """Read all story output and collect all choices."""
-        self.output_lines = []
+        """
+        Read all output lines from the subprocess until choices and/or END marker appear.
+        Returns a list of output lines (strings).
+        """
+        lines = []
 
-        try:
-            while True:
-                line = self.proc.stdout.readline()
-                if not line:
-                    break
+        while True:
+            # Read line asynchronously with a timeout
+            try:
+                line = await asyncio.wait_for(self.process.stdout.readline(), timeout=5)
+            except asyncio.TimeoutError:
+                # No more output for 5 seconds — assume story ended or stuck
+                break
 
-                line = line.strip()
-                self.output_lines.append(line)
+            if not line:
+                # EOF reached
+                break
 
-                if line.startswith("[") and "]" in line:
-                    await asyncio.sleep(0.05)
+            line = line.strip()
+            lines.append(line)
 
-                if "===END===" in line:
-                    break
+            # Wait briefly if line looks like a choice to gather all choices
+            if line.startswith("[") and "]" in line:
+                await asyncio.sleep(0.05)
 
-            return self.output_lines
-        except Exception as e:
-            raise RuntimeError(f"Error reading from Ink story: {e}")
+            if "===END===" in line:
+                break
 
-    def send_choice(self, index: int):
-        try:
-            self.proc.stdin.write(f"{index}\n")
-            self.proc.stdin.flush()
-        except Exception as e:
-            raise RuntimeError(f"Error sending choice to Ink story: {e}")
+        return lines
 
-    def is_finished(self):
-        return any("===END===" in line for line in self.output_lines)
+    async def send_choice(self, index: int):
+        # Send the choice index to the subprocess stdin asynchronously
+        self.process.stdin.write(f"{index}\n")
+        await self.process.stdin.drain()
 
-    def terminate(self):
-        try:
-            self.proc.terminate()
-        except Exception:
-            pass
+    async def is_finished(self):
+        # Check if the last read lines contained the end marker
+        # This should be called after get_next()
+        return any("===END===" in line for line in await self.get_next())
+
+    async def terminate(self):
+        if self.process:
+            self.process.terminate()
+            try:
+                await self.process.wait()
+            except Exception:
+                pass
 
 class ChoiceButton(Button):
     def __init__(self, label, index, session, parent_view):
@@ -66,13 +77,14 @@ class ChoiceButton(Button):
 
     async def callback(self, interaction: discord.Interaction):
         try:
-            self.session.send_choice(self.index)
+            await self.session.send_choice(self.index)
+            # Small pause to let node process choice
             await asyncio.sleep(0.1)
-            lines = await asyncio.wait_for(self.session.get_next(), timeout=3)
+            lines = await self.session.get_next()
 
-            if self.session.is_finished():
-                await interaction.response.edit_message(content="The End.", view=None)
-                self.session.terminate()
+            if any("===END===" in line for line in lines):
+                await interaction.response.edit_message(content="**The End.**", view=None)
+                await self.session.terminate()
                 return
 
             new_text = "\n".join(line for line in lines if not line.startswith("["))
@@ -87,8 +99,8 @@ class ChoiceButton(Button):
 
         except Exception as e:
             tb = traceback.format_exc()
-            await interaction.response.send_message(f"❌ Error: ```\n{tb}\n```", ephemeral=False)
-            self.session.terminate()
+            await interaction.response.send_message(f"❌ Error:\n```\n{tb}\n```", ephemeral=False)
+            await self.session.terminate()
 
 class InkView(View):
     def __init__(self, session, initial_lines):
@@ -111,11 +123,16 @@ class InkCog(commands.Cog):
     @app_commands.command(name="playstory", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
+        session = InkSession()
         try:
-            session = InkSession()
-            lines = await asyncio.wait_for(session.get_next(), timeout=3)
-            text = "\n".join(line for line in lines if not line.startswith("["))
+            await session.start_process()
+            lines = await session.get_next()
+            if not lines:
+                await interaction.followup.send("❌ The story engine did not respond.")
+                await session.terminate()
+                return
 
+            text = "\n".join(line for line in lines if not line.startswith("["))
             view = InkView(session, lines)
             await view.refresh_buttons(lines)
             await interaction.followup.send(content=text, view=view)
@@ -123,6 +140,7 @@ class InkCog(commands.Cog):
         except Exception as e:
             tb = traceback.format_exc()
             await interaction.followup.send(f"❌ Error during story start:\n```\n{tb}\n```", ephemeral=False)
+            await session.terminate()
 
 async def setup(bot):
     await bot.add_cog(InkCog(bot))

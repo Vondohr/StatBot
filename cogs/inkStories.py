@@ -4,6 +4,9 @@ from discord import app_commands
 from discord.ui import View, Button
 import asyncio
 import traceback
+import os
+
+STORY_FILE = "test.json"  # Change this to match the filename you're using
 
 class InkSession:
     def __init__(self):
@@ -23,21 +26,19 @@ class InkSession:
             try:
                 line_bytes = await asyncio.wait_for(self.process.stdout.readline(), timeout=2)
             except asyncio.TimeoutError:
-                break  # No more lines after timeout = end of this story beat
+                break
 
             if not line_bytes:
-                break  # Process closed?
+                break
 
             line = line_bytes.decode("utf-8").strip()
             if line:
                 lines.append(line)
 
-            # End signal
             if "===END===" in line:
                 break
 
         return lines
-
 
     async def send_choice(self, index: int):
         choice_str = f"{index}\n"
@@ -53,11 +54,12 @@ class InkSession:
                 pass
 
 class ChoiceButton(Button):
-    def __init__(self, label, index, session, parent_view):
+    def __init__(self, label, index, session, parent_view, story_title):
         super().__init__(label=label, style=discord.ButtonStyle.primary)
         self.index = index
         self.session = session
         self.parent_view = parent_view
+        self.story_title = story_title
 
     async def callback(self, interaction: discord.Interaction):
         try:
@@ -66,13 +68,24 @@ class ChoiceButton(Button):
             lines = await self.session.get_next()
 
             if any("===END===" in line for line in lines):
-                await interaction.response.edit_message(content="**The End.**", view=None)
+                await interaction.response.edit_message(embed=discord.Embed(
+                    title=self.story_title,
+                    description="**The End.**",
+                    color=discord.Color.blue()
+                ), view=None)
                 await self.session.terminate()
                 return
 
             new_text = "\n".join(line for line in lines if not line.startswith("["))
             self.parent_view.update_buttons(lines)
-            await interaction.response.edit_message(content=new_text, view=self.parent_view)
+
+            embed = discord.Embed(
+                title=self.story_title,
+                description=new_text or "*...*",
+                color=discord.Color.blue()
+            )
+
+            await interaction.response.edit_message(embed=embed, view=self.parent_view)
 
         except Exception:
             tb = traceback.format_exc()
@@ -80,9 +93,10 @@ class ChoiceButton(Button):
             await self.session.terminate()
 
 class InkView(View):
-    def __init__(self, session, lines):
-        super().__init__(timeout=300)  # Optional timeout, e.g. 5 minutes
+    def __init__(self, session, lines, story_title):
+        super().__init__(timeout=300)
         self.session = session
+        self.story_title = story_title
         self.update_buttons(lines)
 
     def update_buttons(self, lines):
@@ -91,16 +105,12 @@ class InkView(View):
             if line.startswith("["):
                 idx = int(line[1])
                 label = line.split("] ", 1)[1]
-                self.add_item(ChoiceButton(label, idx, self.session, self))
+                self.add_item(ChoiceButton(label, idx, self.session, self, self.story_title))
 
     async def on_timeout(self):
-        # Clean up process on timeout
         await self.session.terminate()
-        # Optionally disable all buttons when view times out:
         for child in self.children:
             child.disabled = True
-        # Edit message to disable buttons (you might want to pass the message reference here)
-        # But here we just rely on timeout cleanup
 
 class InkCog(commands.Cog):
     def __init__(self, bot):
@@ -109,18 +119,28 @@ class InkCog(commands.Cog):
     @app_commands.command(name="playstory", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
+
         session = InkSession()
+        story_title = os.path.splitext(os.path.basename(STORY_FILE))[0]  # e.g. "test.json" → "test"
+
         try:
             await session.start_process()
             lines = await session.get_next()
+
             if not lines:
-                await interaction.followup.send("❌ The story engine did not respond.")
                 await session.terminate()
-                return
+                return await interaction.followup.send("❌ The story engine did not respond.")
 
             text = "\n".join(line for line in lines if not line.startswith("["))
-            view = InkView(session, lines)
-            await interaction.followup.send(content=text, view=view)
+            view = InkView(session, lines, story_title)
+
+            embed = discord.Embed(
+                title=story_title,
+                description=text or "*...*",
+                color=discord.Color.blue()
+            )
+
+            await interaction.followup.send(embed=embed, view=view)
 
         except Exception:
             tb = traceback.format_exc()

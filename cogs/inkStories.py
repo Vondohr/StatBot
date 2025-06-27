@@ -6,7 +6,7 @@ import asyncio
 import traceback
 import os
 
-STORY_FILE = "test.json"  # Change this to match the filename you're using
+STORY_FILE = "test.json"  # Name of your compiled Ink story file
 
 class InkSession:
     def __init__(self):
@@ -62,6 +62,10 @@ class ChoiceButton(Button):
         self.story_title = story_title
 
     async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.parent_view.author_id:
+            await interaction.response.send_message("❌ This is not your story.", ephemeral=True)
+            return
+
         try:
             await self.session.send_choice(self.index)
             await asyncio.sleep(0.1)
@@ -93,10 +97,11 @@ class ChoiceButton(Button):
             await self.session.terminate()
 
 class InkView(View):
-    def __init__(self, session, lines, story_title):
+    def __init__(self, session, lines, story_title, author_id):
         super().__init__(timeout=300)
         self.session = session
         self.story_title = story_title
+        self.author_id = author_id
         self.update_buttons(lines)
 
     def update_buttons(self, lines):
@@ -121,7 +126,7 @@ class InkCog(commands.Cog):
         await interaction.response.defer(thinking=True)
 
         session = InkSession()
-        story_title = os.path.splitext(os.path.basename(STORY_FILE))[0]  # e.g. "test.json" → "test"
+        story_title = os.path.splitext(os.path.basename(STORY_FILE))[0]
 
         try:
             await session.start_process()
@@ -132,7 +137,7 @@ class InkCog(commands.Cog):
                 return await interaction.followup.send("❌ The story engine did not respond.")
 
             text = "\n".join(line for line in lines if not line.startswith("["))
-            view = InkView(session, lines, story_title)
+            view = InkView(session, lines, story_title, interaction.user.id)
 
             embed = discord.Embed(
                 title=story_title,

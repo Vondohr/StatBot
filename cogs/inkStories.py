@@ -4,13 +4,11 @@ from discord import app_commands
 from discord.ui import View, Button
 import asyncio
 import traceback
-import os
-
-STORY_FILE = "test.json"  # Name of your compiled Ink story file
 
 class InkSession:
     def __init__(self):
         self.process = None
+        self.story_file = "unknown"
 
     async def start_process(self):
         self.process = await asyncio.create_subprocess_exec(
@@ -19,6 +17,28 @@ class InkSession:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
+
+        # Give it a moment to start up
+        await asyncio.sleep(0.1)
+
+        # Get the story filename from the process arguments
+        try:
+            # Check what args node was called with
+            self.story_file = await self._extract_filename()
+        except Exception:
+            self.story_file = "Unknown"
+
+    async def _extract_filename(self):
+        # This assumes story_runner.js has the story filename hardcoded
+        # So we fake it here with a temp override (alternatively, set it manually)
+        with open("story_runner.js", "r", encoding="utf-8") as f:
+            for line in f:
+                if "fs.readFileSync" in line:
+                    parts = line.strip().split("fs.readFileSync(")
+                    if len(parts) > 1:
+                        filename_part = parts[1].split(",")[0].replace("'", "").replace('"', "").strip()
+                        return filename_part.split("/")[-1].replace(".json", "")
+        return "Unknown"
 
     async def get_next(self):
         lines = []
@@ -124,9 +144,7 @@ class InkCog(commands.Cog):
     @app_commands.command(name="playstory", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
-
         session = InkSession()
-        story_title = os.path.splitext(os.path.basename(STORY_FILE))[0]
 
         try:
             await session.start_process()
@@ -137,6 +155,8 @@ class InkCog(commands.Cog):
                 return await interaction.followup.send("❌ The story engine did not respond.")
 
             text = "\n".join(line for line in lines if not line.startswith("["))
+            story_title = session.story_file
+
             view = InkView(session, lines, story_title, interaction.user.id)
 
             embed = discord.Embed(

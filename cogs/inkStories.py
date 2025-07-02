@@ -143,6 +143,15 @@ class InkCog(commands.Cog):
 
     @app_commands.command(name="play_story", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
+        if any(role.name == "Crew" for role in interaction.user.roles):
+            await interaction.response.send_message("You are not in any Crew! Join one first.", ephemeral=True)
+            return
+        
+        # Check if calling from the Cockpit
+        if "cockpit" not in interaction.channel.name:
+            await interaction.response.send_message("You can only use this command from the Cockpit.", ephemeral=True)
+            return
+        
         await interaction.response.defer(thinking=True)
         session = InkSession()
 

@@ -147,8 +147,7 @@ class InkCog(commands.Cog):
             await interaction.response.send_message("You are not in any Crew! Join one first.", ephemeral=True)
             return
         
-        # Check if calling from the Cockpit
-        if "cockpit" or "Cockpit" not in interaction.channel.name:
+        if not interaction.channel.name.startswith("Cockpit"):
             await interaction.response.send_message("You can only use this command from the Cockpit.", ephemeral=True)
             return
         

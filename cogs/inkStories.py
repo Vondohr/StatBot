@@ -143,7 +143,7 @@ class InkCog(commands.Cog):
 
     @app_commands.command(name="play_story", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
-        if any(role.name == "Crew" for role in interaction.user.roles):
+        if not any(role.name == "Crew" for role in interaction.user.roles):
             await interaction.response.send_message("You are not in any Crew! Join one first.", ephemeral=True)
             return
         

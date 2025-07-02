@@ -148,7 +148,7 @@ class InkCog(commands.Cog):
             return
         
         # Check if calling from the Cockpit
-        if "cockpit" not in interaction.channel.name:
+        if "cockpit" or "Cockpit" not in interaction.channel.name:
             await interaction.response.send_message("You can only use this command from the Cockpit.", ephemeral=True)
             return
         

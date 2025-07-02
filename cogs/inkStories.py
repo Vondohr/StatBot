@@ -141,7 +141,7 @@ class InkCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="playstory", description="Play the story.")
+    @app_commands.command(name="play_story", description="Play the story.")
     async def playstory(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
         session = InkSession()

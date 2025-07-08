@@ -39,7 +39,7 @@ class AdminCreateSpaceship(commands.Cog):
         # Create a new Forum channel
         try:
             forum = await interaction.guild.create_forum(
-                name=spaceship_name,
+                name=f"【❓】{spaceship_name}",
                 category=category,
                 reason=f"Created by {interaction.user} via /admin_create_spaceship"
             )

@@ -30,7 +30,43 @@ class AdminCreateSpaceship(commands.Cog):
             await interaction.followup.send("You are not allowed to use this command!", ephemeral=True)
             return
 
-        interaction.followup.send(f"Running discord.py version:", discord.__version__)
+        # Fetch the category
+        category = interaction.guild.get_channel(FORUM_CATEGORY_ID)
+        if not isinstance(category, discord.CategoryChannel):
+            await interaction.followup.send("Error: Category ID is invalid.", ephemeral=True)
+            return
+
+        # Create a new Forum channel
+        try:
+            forum = await interaction.guild.create_text_channel(
+                name=spaceship_name,
+                category=category,
+                type=discord.ChannelType.forum,
+                reason=f"Created by {interaction.user} via /admin_create_spaceship"
+            )
+        except Exception as e:
+            await interaction.followup.send(f"Failed to create forum: {e}", ephemeral=True)
+            return
+
+        # Create each predefined post
+        for post_name, gif_filename in PREDEFINED_POSTS.items():
+            file_path = os.path.join(os.path.dirname(__file__), gif_filename)
+            if not os.path.isfile(file_path):
+                await interaction.followup.send(f"Missing file: {gif_filename}", ephemeral=True)
+                continue
+
+            try:
+                with open(file_path, "rb") as f:
+                    gif_file = discord.File(f, filename=gif_filename)
+                    await forum.create_thread(
+                        name=post_name,
+                        content=f"**{post_name}** of the ship **{spaceship_name}**.",
+                        file=gif_file
+                    )
+            except Exception as e:
+                await interaction.followup.send(f"Failed to create post '{post_name}': {e}", ephemeral=True)
+
+        await interaction.followup.send(f"Spaceship **{spaceship_name}** created with default rooms!", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(AdminCreateSpaceship(bot))

@@ -32,6 +32,7 @@ class AdminCreateSpaceship(commands.Cog):
 
         interaction.followup.send(f"Running discord.py version:", discord.__version__)
 
+        '''
         # Fetch the category
         category = interaction.guild.get_channel(FORUM_CATEGORY_ID)
         if not isinstance(category, discord.CategoryChannel):
@@ -69,6 +70,7 @@ class AdminCreateSpaceship(commands.Cog):
                 await interaction.followup.send(f"Failed to create post '{post_name}': {e}", ephemeral=True)
 
         await interaction.followup.send(f"Spaceship **{spaceship_name}** created with default rooms!", ephemeral=True)
+        '''
 
 async def setup(bot):
     await bot.add_cog(AdminCreateSpaceship(bot))

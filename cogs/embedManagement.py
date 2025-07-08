@@ -53,7 +53,6 @@ class EmbedCreator(commands.Cog):
 
     @app_commands.command(name="admin_embed_edit", description="Edit an existing embed message")
     @app_commands.describe(
-        channel="Channel where the message is located",
         message_id="ID of the message to edit",
         title="New title",
         description="New description. \ n (without space) for a new line",
@@ -63,7 +62,6 @@ class EmbedCreator(commands.Cog):
         color="New hex color code (e.g. #00FF00)"
     )
     async def embed_edit(self, interaction: discord.Interaction,
-                         channel: discord.abc.Messageable,
                          message_id: str,
                          title: str = None,
                          description: str = None,
@@ -71,6 +69,8 @@ class EmbedCreator(commands.Cog):
                          thumbnail: str = None,
                          image: str = None,
                          color: str = None):
+
+        channel = interaction.channel
 
         member = interaction.guild.get_member(interaction.user.id)
         if not discord.utils.get(member.roles, id=1260298617818841318):

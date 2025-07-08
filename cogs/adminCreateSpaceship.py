@@ -3,8 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import os
 
-# ID of the category where forum channels should be created
-FORUM_CATEGORY_ID = 1303296165923786782  # Your actual category ID
+FORUM_CATEGORY_ID = 1303296165923786782
 
 # Predefined posts and corresponding GIF filenames
 PREDEFINED_POSTS = {
@@ -39,10 +38,9 @@ class AdminCreateSpaceship(commands.Cog):
 
         # Create a new Forum channel
         try:
-            forum = await interaction.guild.create_text_channel(
+            forum = await interaction.guild.create_forum_channel(
                 name=spaceship_name,
                 category=category,
-                type=discord.ChannelType.forum,
                 reason=f"Created by {interaction.user} via /admin_create_spaceship"
             )
         except Exception as e:

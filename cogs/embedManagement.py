@@ -63,7 +63,7 @@ class EmbedCreator(commands.Cog):
         color="New hex color code (e.g. #00FF00)"
     )
     async def embed_edit(self, interaction: discord.Interaction,
-                         channel: discord.TextChannel,
+                         channel: discord.abc.Messageable,
                          message_id: str,
                          title: str = None,
                          description: str = None,

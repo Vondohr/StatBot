@@ -46,8 +46,6 @@ class AdminCreateSpaceship(commands.Cog):
         except Exception as e:
             await interaction.followup.send(f"Failed to create forum: {e}", ephemeral=True)
             return
-        
-        interaction.guild.create_text_channel()
 
         # Create each predefined post
         for post_name, gif_filename in PREDEFINED_POSTS.items():

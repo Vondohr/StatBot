@@ -12,6 +12,7 @@ async def on_ready():
     await asyncio.sleep(2)  # wait for guilds to load
     await bot.tree.sync()
     print("Bot ready! Stats incoming!")
+    print("Running discord.py version:", discord.__version__)
 
 with open("token.txt") as file:
     token = file.read()

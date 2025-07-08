@@ -30,6 +30,8 @@ class AdminCreateSpaceship(commands.Cog):
             await interaction.followup.send("You are not allowed to use this command!", ephemeral=True)
             return
 
+        interaction.followup.send(f"Running discord.py version:", discord.__version__)
+
         # Fetch the category
         category = interaction.guild.get_channel(FORUM_CATEGORY_ID)
         if not isinstance(category, discord.CategoryChannel):

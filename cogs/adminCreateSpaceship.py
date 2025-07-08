@@ -4,7 +4,7 @@ from discord import app_commands
 import os
 
 # ID of the category where forum channels should be created
-FORUM_CATEGORY_ID = 123456789012345678  # Replace with your actual category ID
+FORUM_CATEGORY_ID = 1303296165923786782  # Your actual category ID
 
 # Predefined posts and corresponding GIF filenames
 PREDEFINED_POSTS = {
@@ -26,26 +26,28 @@ class AdminCreateSpaceship(commands.Cog):
     async def admin_create_spaceship(self, interaction: discord.Interaction, spaceship_name: str):
         await interaction.response.defer(ephemeral=True)
 
-        roles = [role for role in interaction.user.roles]
-
-        if not any(role.name == "Narrators" for role in roles):
-            await interaction.response.send_message("You are not allowed to use this command!", ephemeral=True)
+        roles = [role.name for role in interaction.user.roles]
+        if "Narrators" not in roles:
+            await interaction.followup.send("You are not allowed to use this command!", ephemeral=True)
             return
 
         # Fetch the category
-        category = interaction.guild.get_channel(1303296165923786782)
+        category = interaction.guild.get_channel(FORUM_CATEGORY_ID)
         if not isinstance(category, discord.CategoryChannel):
-            return await interaction.followup.send("Error: Category ID is invalid.", ephemeral=True)
+            await interaction.followup.send("Error: Category ID is invalid.", ephemeral=True)
+            return
 
         # Create a new Forum channel
         try:
-            forum = await interaction.guild.create_forum(
+            forum = await interaction.guild.create_text_channel(
                 name=spaceship_name,
                 category=category,
+                type=discord.ChannelType.forum,
                 reason=f"Created by {interaction.user} via /admin_create_spaceship"
             )
         except Exception as e:
-            return await interaction.followup.send(f"Failed to create forum: {e}", ephemeral=True)
+            await interaction.followup.send(f"Failed to create forum: {e}", ephemeral=True)
+            return
 
         # Create each predefined post
         for post_name, gif_filename in PREDEFINED_POSTS.items():
@@ -60,7 +62,7 @@ class AdminCreateSpaceship(commands.Cog):
                     await forum.create_thread(
                         name=post_name,
                         content=f"**{post_name}** of the ship **{spaceship_name}**.",
-                        files=[gif_file]
+                        file=gif_file
                     )
             except Exception as e:
                 await interaction.followup.send(f"Failed to create post '{post_name}': {e}", ephemeral=True)

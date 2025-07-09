@@ -30,6 +30,16 @@ class AdminCreateSpaceship(commands.Cog):
             await interaction.followup.send("You are not allowed to use this command!", ephemeral=True)
             return
 
+        # Create a new role for the spaceship
+        try:
+            spaceship_role = await interaction.guild.create_role(
+                name=f"Spaceship {spaceship_name}",
+                reason=f"Role for spaceship '{spaceship_name}' created by {interaction.user}"
+            )
+        except Exception as e:
+            await interaction.followup.send(f"Failed to create role: {e}", ephemeral=True)
+            return
+
         # Fetch the category
         category = interaction.guild.get_channel(FORUM_CATEGORY_ID)
         if not isinstance(category, discord.CategoryChannel):

@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import os
 
-FORUM_CATEGORY_ID = 1303296165923786782
+FORUM_CATEGORY_ID = 1260704136475967498 # Spaceship Category in BHC
 
 # Predefined posts and corresponding GIF filenames
 PREDEFINED_POSTS = {

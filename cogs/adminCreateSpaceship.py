@@ -75,7 +75,7 @@ class AdminCreateSpaceship(commands.Cog):
             except Exception as e:
                 await interaction.followup.send(f"Failed to create post '{post_name}': {e}", ephemeral=True)
 
-        await interaction.followup.send(f"Spaceship **{spaceship_name}** created with default rooms!", ephemeral=True)
+        await interaction.followup.send(f"Spaceship **{spaceship_name}** created with default rooms! Role 'Spaceship {spaceship_name}' also created.", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(AdminCreateSpaceship(bot))

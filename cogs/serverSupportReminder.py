@@ -43,7 +43,7 @@ class WeeklyEmbed(commands.Cog):
     @tasks.loop(minutes=1)
     async def check_time(self):
         if self.is_time_to_send():
-            channel = self.bot.get_channel(1260348000316817501)
+            channel = self.bot.get_channel(1258379466376216597)
             if channel:
                 embed = self.create_embed()
                 await channel.send(embed=embed)

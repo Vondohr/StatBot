@@ -16,8 +16,8 @@ class WeeklyEmbed(commands.Cog):
     def create_embed(self):
         embed = discord.Embed(
             title="If you enjoy what this server offers, keep reading!",
-            description="**Don't forget that you can support us here: https://discord.com/channels/1258379465919041589/1293211215262253097**\n\nYou can:\n-Get a cool unicode icon for your Crew channel!\n-Get your own Opening Crawl\n-Gain access to an upper floor of Hunter's Bounty, with jukebox and other cool stuff!\n-Feel good that you supported something you like!",
-            color=discord.Color.teal()
+            description="Don't forget that you can support us here: https://discord.com/channels/1258379465919041589/1293211215262253097\n\nYou can:\n- Get a cool unicode icon for your Crew channel!\n- Get your own Opening Crawl\n- Gain access to an upper floor of Hunter's Bounty, with jukebox and other cool stuff!\n- Feel good that you supported something you like!\n",
+            color=discord.Color.gold()
         )
         embed.set_footer(text="We love you all ♥️")
         return embed

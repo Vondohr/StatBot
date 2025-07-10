@@ -19,6 +19,7 @@ class WeeklyEmbed(commands.Cog):
             description="Don't forget that you can support us here: https://discord.com/channels/1258379465919041589/1293211215262253097\n\nYou can:\n- Get a cool unicode icon for your Crew channel!\n- Get your own Opening Crawl\n- Gain access to an upper floor of Hunter's Bounty, with jukebox and other cool stuff!\n- Feel good that you supported something you like!\n",
             color=discord.Color.gold()
         )
+        embed.set_image(url="https://c.tenor.com/nwBMOVfhuS0AAAAC/tenor.gif")
         embed.set_footer(text="We love you all ♥️")
         return embed
 

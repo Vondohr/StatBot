@@ -30,7 +30,6 @@ class WeeklyEmbed(commands.Cog):
         if now.weekday() != 3:  # 0=Monday, 3=Thursday
             return False
         
-        '''
         if now.hour != 20 or now.minute != 0:
             return False
 
@@ -38,7 +37,6 @@ class WeeklyEmbed(commands.Cog):
         today = now.date()
         if self.last_sent_date == today:
             return False
-        '''
             
         return True
 

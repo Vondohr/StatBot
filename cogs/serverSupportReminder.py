@@ -27,7 +27,7 @@ class WeeklyEmbed(commands.Cog):
         now = datetime.now(self.timezone)
 
         # Thursday at 20:00
-        if now.weekday() != 3:  # 0=Monday, 3=Thursday
+        if now.weekday() != 4:  # 0=Monday, 4=Friday
             return False
         
         if now.hour != 20 or now.minute != 0:

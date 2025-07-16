@@ -11,7 +11,7 @@ JSON_FILE = "posted_entries.json"
 class RSSFeedCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.channel_id = 1260348000316817501
+        self.channel_id = 1395036832303022150
         self.posted_ids = self.load_posted_ids()
         self.check_feed.start()
 

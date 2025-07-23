@@ -36,8 +36,6 @@ class EmbedCreator(commands.Cog):
                 await interaction.response.send_message("Invalid hex color code. Use format like #FF0000.", ephemeral=True)
                 return
 
-        specThumbnail = "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDVrMWtkZDQ0NTlqaHZiOGlkOWdjYngyMHY3Zmk3ZnFrb2VhNmFhZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/t3no5FaiqloWosWVHf/giphy.gif"
-
         embed = discord.Embed(color=embed_color)
         if title:
             embed.title = title
@@ -46,7 +44,7 @@ class EmbedCreator(commands.Cog):
         if footer:
             embed.set_footer(text=footer.replace("\\n", "\n"))
         if thumbnail:
-            embed.set_thumbnail(url=specThumbnail)
+            embed.set_thumbnail(url=thumbnail)
         if image:
             embed.set_image(url=image)
 

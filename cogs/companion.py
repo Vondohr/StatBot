@@ -50,7 +50,7 @@ class Companion(commands.Cog):
     @app_commands.command(name="companion", description="Show my Companion")
     @discord.app_commands.describe(hidden="Should the message be hidden")
     async def companion(self, interaction: discord.Interaction, hidden: bool = True):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=hidden)
 
         embed = discord.Embed(color=discord.Color.dark_purple())
         embed.title = "Name of the Companion"

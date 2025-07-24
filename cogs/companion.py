@@ -48,7 +48,8 @@ class Companion(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="companion", description="Show my Companion")
-    async def companion(self, interaction: discord.Interaction):
+    @discord.app_commands.describe(hidden="Should the message be hidden")
+    async def companion(self, interaction: discord.Interaction, hidden: bool = True):
         await interaction.response.defer(ephemeral=True)
 
         embed = discord.Embed(color=discord.Color.dark_purple())
@@ -65,7 +66,7 @@ class Companion(commands.Cog):
         embed.set_image(url="https://static.wikia.nocookie.net/starwars/images/1/16/BD-1_JFO.png")
         embed.set_thumbnail(url="https://staticdelivery.nexusmods.com/mods/3061/images/thumbnails/800/800-1736279938-532506678.png")
 
-        await interaction.followup.send(embed=embed, view=CompanionView(), ephemeral=True)
+        await interaction.followup.send(embed=embed, view=CompanionView(), ephemeral=hidden)
 
 
 # This must be added to register the persistent view

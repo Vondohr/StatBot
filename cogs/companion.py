@@ -17,27 +17,27 @@ class CompanionView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)  # Persistent view
 
-    @discord.ui.button(label="Feed", style=discord.ButtonStyle.green, custom_id="feed_companion", emoji="🛞")
+    @discord.ui.button(label="Feed", style=discord.ButtonStyle.green, custom_id="feed_companion", emoji="🥣")
     async def feed(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("🍽️ You fed your companion!", ephemeral=True)
 
-    @discord.ui.button(label="Pet", style=discord.ButtonStyle.red, custom_id="pet_companion", emoji="👹")
+    @discord.ui.button(label="Pet", style=discord.ButtonStyle.green, custom_id="pet_companion", emoji="♥️")
     async def pet(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("🐾 You gave your companion some pets!", ephemeral=True)
 
-    @discord.ui.button(label="Teach", style=discord.ButtonStyle.grey, custom_id="teach_companion", emoji="🏴")
+    @discord.ui.button(label="Teach", style=discord.ButtonStyle.blurple, custom_id="teach_companion", emoji="📖")
     async def teach(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("📚 You taught your companion something new!", ephemeral=True)
 
-    @discord.ui.button(label="Train", style=discord.ButtonStyle.blurple, custom_id="train_companion", emoji="🎲")
+    @discord.ui.button(label="Train", style=discord.ButtonStyle.blurple, custom_id="train_companion", emoji="🔁")
     async def train(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("🏋️ Your companion has trained!", ephemeral=True)
 
-    @discord.ui.button(label="Use (Roll)", style=discord.ButtonStyle.blurple, custom_id="roll_companion", emoji="🎲")
+    @discord.ui.button(label="Use (Roll)", style=discord.ButtonStyle.red, custom_id="roll_companion", emoji="🎲")
     async def roll(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("🎲 You rolled with your companion!", ephemeral=True)
 
-    @discord.ui.button(label="Rename", style=discord.ButtonStyle.blurple, custom_id="rename_companion", emoji="🎲")
+    @discord.ui.button(label="Rename", style=discord.ButtonStyle.grey, custom_id="rename_companion", emoji="📝")
     async def rename(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(RenameModal())
 

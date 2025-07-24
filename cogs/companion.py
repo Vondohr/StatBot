@@ -2,6 +2,47 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+# Modal for renaming
+class RenameModal(discord.ui.Modal, title="Rename Your Companion"):
+    new_name = discord.ui.TextInput(label="New Name", placeholder="Enter a new name for your companion")
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            f"✅ Companion renamed to **{self.new_name.value}**!", ephemeral=True
+        )
+
+
+# Button View with listeners
+class CompanionView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)  # Persistent view
+
+    @discord.ui.button(label="Feed", style=discord.ButtonStyle.green, custom_id="feed_companion", emoji="🛞")
+    async def feed(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("🍽️ You fed your companion!", ephemeral=True)
+
+    @discord.ui.button(label="Pet", style=discord.ButtonStyle.red, custom_id="pet_companion", emoji="👹")
+    async def pet(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("🐾 You gave your companion some pets!", ephemeral=True)
+
+    @discord.ui.button(label="Teach", style=discord.ButtonStyle.grey, custom_id="teach_companion", emoji="🏴")
+    async def teach(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("📚 You taught your companion something new!", ephemeral=True)
+
+    @discord.ui.button(label="Train", style=discord.ButtonStyle.blurple, custom_id="train_companion", emoji="🎲")
+    async def train(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("🏋️ Your companion has trained!", ephemeral=True)
+
+    @discord.ui.button(label="Use (Roll)", style=discord.ButtonStyle.blurple, custom_id="roll_companion", emoji="🎲")
+    async def roll(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("🎲 You rolled with your companion!", ephemeral=True)
+
+    @discord.ui.button(label="Rename", style=discord.ButtonStyle.blurple, custom_id="rename_companion", emoji="🎲")
+    async def rename(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(RenameModal())
+
+
+# The main command
 class Companion(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -9,10 +50,8 @@ class Companion(commands.Cog):
     @app_commands.command(name="companion", description="Show my Companion")
     async def companion(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        
+
         embed = discord.Embed(color=discord.Color.dark_purple())
-        # embed.set_image(url="https://compote.slate.com/images/1aeebdcb-9972-40bf-b5f1-05f32888b59d.gif")
-        
         embed.title = "Name of the Companion"
         embed.description = (
             "**Vitality:** 24/32\n"
@@ -23,24 +62,13 @@ class Companion(commands.Cog):
             "**Level:** 10\n"
             "- Adds blabla to the Companion's Die"
         )
-        buttons = [
-            ("Feed", "green", "feed_companion", "\U0001F6DE"),
-            ("Pet", "red", "pet_companion", "\U0001F479"),
-            ("Teach", "grey", "teach_companion", "\U0001F3F4"),
-            ("Train", "blurple", "train_companion", "\U0001F3B2")
-            ("Use (Roll)", "blurple", "roll_companion", "\U0001F3B2")
-            ("Rename", "blurple", "rename_companion", "\U0001F3B2")
-        ]
         embed.set_image(url="https://static.wikia.nocookie.net/starwars/images/1/16/BD-1_JFO.png")
         embed.set_thumbnail(url="https://staticdelivery.nexusmods.com/mods/3061/images/thumbnails/800/800-1736279938-532506678.png")
 
-        view = discord.ui.View()
-        for label, style, custom_id, emoji in buttons:
-            button = discord.ui.Button(label=label, style=getattr(discord.ButtonStyle, style), custom_id=custom_id, emoji=emoji)
-            view.add_item(button)
-
-        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        await interaction.followup.send(embed=embed, view=CompanionView(), ephemeral=True)
 
 
+# This must be added to register the persistent view
 async def setup(bot):
     await bot.add_cog(Companion(bot))
+    bot.add_view(CompanionView())  # ✅ Necessary for persistent button listeners

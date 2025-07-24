@@ -1,3 +1,4 @@
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -45,6 +46,16 @@ class CompanionView(discord.ui.View):
     @discord.ui.button(label="Use (Roll)", style=discord.ButtonStyle.red, custom_id="roll_companion", emoji="🎲")
     async def roll(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("🎲 You rolled with your companion!", ephemeral=True)
+
+        roll = random.randint(1, 15)
+
+        embed = discord.Embed(
+            title=f"**{interaction.user.display_name}'s** companion rolled its die! 🎲",
+            description=f"# ⟪ [{roll}](https://www.youtube.com/watch?v=dQw4w9WgXcQ) ⟫",
+            color=discord.Color.dark_gray()
+        )
+
+        await interaction.channel.send(embed=embed)
 
     @discord.ui.button(label="Rename", style=discord.ButtonStyle.grey, custom_id="rename_companion", emoji="📝")
     async def rename(self, interaction: discord.Interaction, button: discord.ui.Button):

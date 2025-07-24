@@ -12,10 +12,19 @@ class RenameModal(discord.ui.Modal, title="Rename Your Companion"):
         )
 
 
-# Button View with listeners
+# Button View with listeners, restricted to one user
 class CompanionView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)  # Persistent view
+    def __init__(self, user: discord.User):
+        super().__init__(timeout=None)
+        self.user = user  # Store the user who invoked the command
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message(
+                "❌ These buttons aren't for you.", ephemeral=True
+            )
+            return False
+        return True
 
     @discord.ui.button(label="Feed", style=discord.ButtonStyle.green, custom_id="feed_companion", emoji="🥣")
     async def feed(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -66,10 +75,8 @@ class Companion(commands.Cog):
         embed.set_image(url="https://static.wikia.nocookie.net/starwars/images/1/16/BD-1_JFO.png")
         embed.set_thumbnail(url="https://staticdelivery.nexusmods.com/mods/3061/images/thumbnails/800/800-1736279938-532506678.png")
 
-        await interaction.followup.send(embed=embed, view=CompanionView(), ephemeral=hidden)
+        view = CompanionView(user=interaction.user)  # 👈 Pass the command user
+        await interaction.followup.send(embed=embed, view=view, ephemeral=hidden)
 
-
-# This must be added to register the persistent view
 async def setup(bot):
     await bot.add_cog(Companion(bot))
-    bot.add_view(CompanionView())  # ✅ Necessary for persistent button listeners

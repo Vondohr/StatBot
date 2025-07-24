@@ -8,8 +8,9 @@ class RenameModal(discord.ui.Modal, title="Rename Your Companion"):
     new_name = discord.ui.TextInput(label="New Name", placeholder="Enter a new name for your companion")
 
     async def on_submit(self, interaction: discord.Interaction):
+        # This acts as the listener
         await interaction.response.send_message(
-            f"✅ Companion renamed to **{self.new_name.value}**!", ephemeral=True
+            f"✅ Your companion has been renamed to **{self.new_name.value}**!", ephemeral=True
         )
 
 
@@ -86,8 +87,10 @@ class Companion(commands.Cog):
         embed.set_image(url="https://static.wikia.nocookie.net/starwars/images/1/16/BD-1_JFO.png")
         embed.set_thumbnail(url="https://staticdelivery.nexusmods.com/mods/3061/images/thumbnails/800/800-1736279938-532506678.png")
 
-        view = CompanionView(user=interaction.user)  # 👈 Pass the command user
+        view = CompanionView(user=interaction.user)
         await interaction.followup.send(embed=embed, view=view, ephemeral=hidden)
 
+
+# Register the command and view
 async def setup(bot):
     await bot.add_cog(Companion(bot))

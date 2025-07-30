@@ -1,5 +1,6 @@
 # cogs/menu.py
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 
@@ -52,7 +53,7 @@ class MenuCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.hybrid_command(name="menuTesting", description="Send an embed with a dropdown menu.")
+    @app_commands.command(name="menuRolldown", description="Show my Companion")
     async def menu(self, ctx: commands.Context):
         """Works as both a prefix and slash command."""
         embed = discord.Embed(

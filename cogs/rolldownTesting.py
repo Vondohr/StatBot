@@ -5,16 +5,12 @@ from discord.ext import commands
 
 
 class Dropdown(discord.ui.Select):
-    def __init__(self, interaction: discord.Interaction):
-        e = discord.utils.get(interaction.guild.emojis, name="assault")
-        emojiAssault = discord.PartialEmoji.from_str(f"<:assault:{e.id}>")
-        
+    def __init__(self, assault_emoji: discord.Emoji | discord.PartialEmoji | None = None):
         options = [
             discord.SelectOption(
                 label="Option 1",
                 description="This is the first option",
-                # Use a Unicode emoji or a real custom emoji object (see note below).
-                emoji=emojiAssault,
+                emoji=assault_emoji or "🛡️",  # fallback if not found
             ),
             discord.SelectOption(
                 label="Option 2",
@@ -27,13 +23,11 @@ class Dropdown(discord.ui.Select):
                 emoji="🔥",
             ),
         ]
-
         super().__init__(
             placeholder="Choose an option...",
             min_values=1,
             max_values=1,
             options=options,
-            # custom_id="menu:example:1",  # uncomment for persistent views
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -47,25 +41,33 @@ class Dropdown(discord.ui.Select):
 
 
 class DropdownView(discord.ui.View):
-    def __init__(self, *, timeout: float | None = 180):
+    def __init__(self, assault_emoji: discord.Emoji | discord.PartialEmoji | None, *, timeout: float | None = 180):
         super().__init__(timeout=timeout)
-        self.add_item(Dropdown())
+        self.add_item(Dropdown(assault_emoji))
 
 
 class MenuCog(commands.Cog):
-    """Sends an embed with a dropdown (select) menu."""
-
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @app_commands.command(name="menurolldown", description="Show my companion")
     async def menurolldown(self, interaction: discord.Interaction):
+        # Try to find the emoji in the CURRENT guild
+        assault = discord.utils.get(interaction.guild.emojis, name="assault")
+
+        # OPTIONAL: if the emoji lives in another guild, fetch it from there by ID
+        # OTHER_GUILD_ID = 123456789012345678
+        # assault = discord.utils.get(self.bot.get_guild(OTHER_GUILD_ID).emojis, name="assault")
+
+        # If still not found but you know the ID:
+        # assault = discord.PartialEmoji.from_str("<:assault:123456789012345678>")
+
         embed = discord.Embed(
             title="Choose an option",
             description="Use the dropdown below to make a selection.",
             color=discord.Color.green(),
         )
-        view = DropdownView()
+        view = DropdownView(assault_emoji=assault)
         await interaction.response.send_message(embed=embed, view=view)
 
 

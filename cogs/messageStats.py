@@ -49,7 +49,17 @@ class MessageCounter(commands.Cog):
         if previous == 0:
             return "∞%" if current > 0 else "0%"
         change = ((current - previous) / previous) * 100
-        return f"{change:+.2f}%"
+
+        returnString = ""
+
+        if change > 0:
+            returnString = f"{change:+.2f}% 🠉🟩"
+        elif change < 0:
+            returnString = f"{change:+.2f}% 🠋🟥"
+        else:
+            returnString = f"{change:+.2f}%"
+
+        return returnString
 
     def get_stats_for_days(self, days):
         today = datetime.utcnow().date()

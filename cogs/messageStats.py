@@ -99,6 +99,10 @@ class MessageCounter(commands.Cog):
     @app_commands.command(name="stats", description="Show message count stats.")
     @app_commands.describe(period_type="Choose day/week/month", amount="How many periods back to show")
     async def stats(self, interaction: discord.Interaction, period_type: str, amount: int):
+        if amount > 25 or amount < 1:
+            await interaction.response.send_message("Amount must be between 1 and 25.", ephemeral=True) # 0 Days don't make sense, and 25 is the maximum amount of fields per embed
+            return
+        
         period_type = period_type.lower()
         if period_type not in ["days", "weeks", "months"]:
             await interaction.response.send_message("Invalid period type! Use: days, weeks, months", ephemeral=True)

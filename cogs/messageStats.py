@@ -1,10 +1,11 @@
-import discord
-from discord.ext import commands
-from discord import app_commands
 import json
 import os
-from datetime import datetime, timedelta, date
 from collections import defaultdict
+from datetime import date, datetime, timedelta
+
+import discord
+from discord import app_commands
+from discord.ext import commands
 
 DATA_FILE = "message_counts.json"
 
@@ -53,9 +54,9 @@ class MessageCounter(commands.Cog):
         returnString = ""
 
         if change > 0:
-            returnString = f"{change:+.2f}% 🠉🟩"
+            returnString = f"{change:+.2f}% ⬆️🟩"
         elif change < 0:
-            returnString = f"{change:+.2f}% 🠋🟥"
+            returnString = f"{change:+.2f}% ⬇️🟥"
         else:
             returnString = f"{change:+.2f}%"
 

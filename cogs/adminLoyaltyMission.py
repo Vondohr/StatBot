@@ -27,7 +27,7 @@ class AdminLoyaltyMission(commands.Cog):
             await interaction.response.send_message("Error: 'Crew Narrator' or 'Loyalty Marked' roles not found.", ephemeral=True)
             return
 
-        spaceship_role = spaceship
+        spaceship_role = spaceship.name
         parts = spaceship_role.split(" ", 1)
         if parts[0].lower() != "spaceship":
             await interaction.response.send_message("Invalid spaceship role format.", ephemeral=True)
@@ -60,6 +60,8 @@ class AdminLoyaltyMission(commands.Cog):
         '''
 
         loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
+        if loyalty_nicknames == []:
+            loyalty_nicknames = "nobody"
 
         affected = []
         for member in spaceship.members:

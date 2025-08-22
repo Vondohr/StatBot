@@ -91,6 +91,7 @@ class LoyaltyMission(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="loyalty_mission", description="Start a Loyalty Mission for your Crewmate.")
+    @app_commands.describe(player="The Player who you want to Narrate the Loyalty Mission for.")
     async def loyalty_mission(self, interaction: discord.Interaction, player: discord.Member):
         
         if not any(role.name == "Crew" for role in interaction.user.roles):

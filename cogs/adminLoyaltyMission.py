@@ -13,8 +13,8 @@ class AdminLoyaltyMission(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="admin_loyalty_end", description="End a Loyalty Mission for all members of a Crew.")
-    @app_commands.describe(role="The role of the Crew that finished the Loyalty Mission")
-    async def admin_loyalty_end(self, interaction: discord.Interaction, role: discord.Role):
+    @app_commands.describe(spaceship="The role of the Crew that finished the Loyalty Mission")
+    async def admin_loyalty_end(self, interaction: discord.Interaction, spaceship: discord.Role):
         if not any(r.name == ADMIN_ROLE_NAME for r in interaction.user.roles):
             await interaction.response.send_message("You don't have permission to end this mission.", ephemeral=True)
             return
@@ -27,10 +27,10 @@ class AdminLoyaltyMission(commands.Cog):
             await interaction.response.send_message("Error: 'Crew Narrator' or 'Loyalty Marked' roles not found.", ephemeral=True)
             return
 
-        loyalty_nicknames = [member.display_name for member in role.members if loyalty_role in member.roles]
+        loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
 
         affected = []
-        for member in role.members:
+        for member in spaceship.members:
             roles_to_remove = [r for r in [narrator_role, loyalty_role] if r in member.roles]
             if roles_to_remove:
                 try:
@@ -42,11 +42,11 @@ class AdminLoyaltyMission(commands.Cog):
         if affected:
             messageString = f"Removed **{NARRATOR_ROLE_NAME}** and **{LOYALTY_ROLE_NAME}** roles from: {', '.join(affected)}"
         else:
-            messageString = f"No members in {role} had any Loyalty Mission roles to remove.", ephemeral=True
+            messageString = f"No members in {spaceship} had any Loyalty Mission roles to remove.", ephemeral=True
 
         embed = discord.Embed(
             title=f"Loyalty Mission Ended",
-            description=f"Loyalty Mission ended for the Crew of {role}**\n\nOne Reroll rewarded to {loyalty_nicknames}!",
+            description=f"Loyalty Mission ended for the Crew of {spaceship}**\n\nOne Reroll rewarded to {loyalty_nicknames}!",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/6d3dfbf948c657abf2fa93c0ad0ff836/495d2ace7fab6c1a-03/s540x810/be49d7f4da569d2a61f6d0c5cb78e8c96b668c5a.gif")

@@ -134,7 +134,7 @@ class LoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title=f"Loyalty Mission",
-            description=f"Loyalty Mission prepared for {player.mention}. {interaction.user.mention} will be the Crew Narrator\n\n**A Narrator must start the Mission.**",
+            description=f"Loyalty Mission prepared for {player.mention}. {interaction.user.mention} will be the Crew Narrator\n\n**One of the server Admins/Narrators must start the Mission.**",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/18d4a604b3b44ff8c6d2556a8da8cb34/4c683c0be10a5deb-22/s500x750/84fa248322bdf0a4080354615487c08a0bb94817.gif")

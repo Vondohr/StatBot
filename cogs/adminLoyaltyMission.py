@@ -59,9 +59,17 @@ class AdminLoyaltyMission(commands.Cog):
             conn.close()
         '''
 
-        loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
-        if loyalty_nicknames == []:
-            loyalty_nicknames = "nobody"
+        loyalty_nicknames = []
+        for member in spaceship.members:
+            member_to_mention = [r for r in [loyalty_role] if r in member.roles]
+            if member_to_mention:
+                loyalty_nicknames.append(member.display_name)
+
+        if loyalty_nicknames:
+            rewardedString = f"One Reroll rewarded to {', '.join(loyalty_nicknames)}"
+        else:
+            rewardedString = f"No Rerolls rewarded!"
+
 
         affected = []
         for member in spaceship.members:
@@ -80,7 +88,7 @@ class AdminLoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title=f"Loyalty Mission Ended",
-            description=f"Loyalty Mission ended for the Crew of {spaceship}\n\n**One Reroll rewarded to {loyalty_nicknames}!**",
+            description=f"Loyalty Mission has been completed for the Crew of {spaceship}\n\n**{rewardedString}**",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/6d3dfbf948c657abf2fa93c0ad0ff836/495d2ace7fab6c1a-03/s540x810/be49d7f4da569d2a61f6d0c5cb78e8c96b668c5a.gif")

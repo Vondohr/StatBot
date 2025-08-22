@@ -60,7 +60,7 @@ class AdminLoyaltyMission(commands.Cog):
         '''
 
         loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
-        if not loyalty_nicknames:
+        if loyalty_nicknames == []:
             loyalty_nicknames = "nobody"
 
         affected = []

@@ -11,6 +11,8 @@ ADMIN_ROLE_NAME = "Narrators"
 class AdminLoyaltyMission(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.bot.tree.add_command(self.admin_loyalty_end, guild=discord.Object(id=1258379465919041589))
+
 
     @app_commands.command(name="admin_loyalty_end", description="End a Loyalty Mission for all members of a Crew.")
     @app_commands.describe(spaceship="The role of the Crew that finished the Loyalty Mission")

@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-# CHANGE THESE ROLE NAMES TO MATCH YOUR SERVER
 NARRATOR_ROLE_NAME = "Crew Narrator"
 LOYALTY_ROLE_NAME = "Loyalty Marked"
 ADMIN_ROLE_NAME = "Narrators"
@@ -21,6 +20,7 @@ class LoyaltyMissionView(discord.ui.View):
         if not any(r.name == ADMIN_ROLE_NAME for r in interaction.user.roles):
             await interaction.response.send_message("You don't have permission to start this mission.", ephemeral=True)
             return
+        
         
         '''
         user = self.author

@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-# SAME ROLE NAMES AS BEFORE
 NARRATOR_ROLE_NAME = "Crew Narrator"
 LOYALTY_ROLE_NAME = "Loyalty Marked"
 ADMIN_ROLE_NAME = "Narrators"

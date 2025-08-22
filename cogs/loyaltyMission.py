@@ -1,3 +1,5 @@
+import sqlite3
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -19,6 +21,46 @@ class LoyaltyMissionView(discord.ui.View):
         if not any(r.name == ADMIN_ROLE_NAME for r in interaction.user.roles):
             await interaction.response.send_message("You don't have permission to start this mission.", ephemeral=True)
             return
+        
+        '''
+        user = self.author
+        user_roles = [role.name for role in user.roles]
+        spaceship_role = next((r for r in user_roles if r.startswith("Spaceship")), None)
+        if not spaceship_role:
+            await interaction.followup.send("Player has no Crew!", ephemeral=True)
+            return
+
+        parts = spaceship_role.split(" ", 1)
+        if len(parts) != 2:
+            await interaction.followup.send("Invalid spaceship role format.", ephemeral=True)
+            return
+        ship_key = parts[1].lower()
+
+        conn = sqlite3.connect("data/ship_data.db")
+        cur = conn.cursor()
+        
+        cur.execute("SELECT active_bounty FROM ship_data WHERE id = ?", (ship_key,))
+        row = cur.fetchone()
+        if not row:
+
+            active_bounty = "undefined"
+        else:
+            active_bounty = row[3] if row[3] is not None else "undefined"
+
+        if active_bounty != "undefined":
+            conn.close()
+            await interaction.followup.send("The Crew already has an active bounty.", ephemeral=True)
+            return
+
+        name_of_bounty = "loyalty_mission"
+
+        cur.execute(
+            "UPDATE ship_data SET active_bounty=? WHERE id=?",
+            (name_of_bounty, ship_key),
+        )
+        conn.commit()
+        conn.close()
+        '''
 
         guild = interaction.guild
         narrator_role = discord.utils.get(guild.roles, name=NARRATOR_ROLE_NAME)
@@ -56,6 +98,35 @@ class LoyaltyMission(commands.Cog):
             return
         
         # CHECK FOR RUNNING BOUNTIES NEEDED
+        '''
+        user = interaction.user
+        user_roles = [role.name for role in user.roles]
+        spaceship_role = next((r for r in user_roles if r.startswith("Spaceship")), None)
+        if not spaceship_role:
+            await interaction.followup.send("You have no crew! You cannot accept bounties.", ephemeral=True)
+            return
+
+        parts = spaceship_role.split(" ", 1)
+        if len(parts) != 2:
+            await interaction.followup.send("Invalid spaceship role format.", ephemeral=True)
+            return
+        ship_key = parts[1].lower()
+
+        conn = sqlite3.connect("data/ship_data.db")
+        cur = conn.cursor()
+        
+        cur.execute("SELECT active_bounty FROM ship_data WHERE id = ?", (ship_key,))
+        row = cur.fetchone()
+        if not row:
+            active_bounty = "undefined"
+        else:
+            active_bounty = row[3] if row[3] is not None else "undefined"
+
+        if active_bounty != "undefined":
+            conn.close()
+            await interaction.followup.send("You already have an active bounty! Finish the current one first.", ephemeral=True)
+            return
+        '''
 
         embed = discord.Embed(
             title=f"Loyalty Mission",

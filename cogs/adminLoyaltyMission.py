@@ -74,7 +74,7 @@ class AdminLoyaltyMission(commands.Cog):
         if affected:
             messageString = f"Removed **{NARRATOR_ROLE_NAME}** and **{LOYALTY_ROLE_NAME}** roles from: {', '.join(affected)}"
         else:
-            messageString = f"No members in {spaceship} had any Loyalty Mission roles to remove.", ephemeral=True
+            messageString = f"No members in {spaceship} had any Loyalty Mission roles to remove."
 
         embed = discord.Embed(
             title=f"Loyalty Mission Ended",

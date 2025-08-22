@@ -8,7 +8,7 @@ NARRATOR_ROLE_NAME = "Crew Narrator"
 LOYALTY_ROLE_NAME = "Loyalty Marked"
 ADMIN_ROLE_NAME = "Narrators"
 
-class LoyaltyMissionAdmin(commands.Cog):
+class AdminLoyaltyMission(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -55,4 +55,4 @@ class LoyaltyMissionAdmin(commands.Cog):
         await interaction.channel.send(embed=embed)
 
 async def setup(bot):
-    await bot.add_cog(LoyaltyMissionAdmin(bot))
+    await bot.add_cog(AdminLoyaltyMission(bot))

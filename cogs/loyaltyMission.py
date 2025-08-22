@@ -4,7 +4,7 @@ from discord import app_commands
 
 # CHANGE THESE ROLE NAMES TO MATCH YOUR SERVER
 NARRATOR_ROLE_NAME = "Crew Narrator"
-LOYALTY_ROLE_NAME = "Loyalty Mission"
+LOYALTY_ROLE_NAME = "Loyalty Marked"
 ADMIN_ROLE_NAME = "Narrators"
 
 class LoyaltyMissionView(discord.ui.View):
@@ -33,7 +33,7 @@ class LoyaltyMissionView(discord.ui.View):
             await self.author.add_roles(narrator_role)
             await self.target.add_roles(loyalty_role)
             await interaction.response.send_message(
-                f"✅ Loyalty Mission started! {self.author.mention} is now {narrator_role.mention}, and {self.target.mention} received {loyalty_role.mention}."
+                f"✅ Loyalty Mission started! {self.author.mention} is now {narrator_role.mention}, and {self.target.mention} is now {loyalty_role.mention}."
             )
         except discord.Forbidden:
             await interaction.response.send_message("I don’t have permission to manage roles.", ephemeral=True)
@@ -54,7 +54,7 @@ class LoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title="Loyalty Mission",
-            description=f"Loyalty Mission prepared for {player.mention}. An Admin must start it.",
+            description=f"Loyalty Mission prepared for {player.mention}. A Narrator must start it.",
             color=discord.Color.blue()
         )
         view = LoyaltyMissionView(interaction.user, player)

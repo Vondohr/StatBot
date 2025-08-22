@@ -29,8 +29,8 @@ class AdminLoyaltyMission(commands.Cog):
 
         spaceship_role = spaceship
         parts = spaceship_role.split(" ", 1)
-        if len(parts) != 2:
-            await interaction.followup.send("Invalid spaceship role format.", ephemeral=True)
+        if parts[0].lower() != "spaceship":
+            await interaction.response.send_message("Invalid spaceship role format.", ephemeral=True)
             return
         ship_key = parts[1].lower()
 

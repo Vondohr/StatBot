@@ -97,6 +97,10 @@ class LoyaltyMission(commands.Cog):
             await interaction.response.send_message("You are not in any Crew! Join one first.", ephemeral=True)
             return
         
+        if interaction.channel.category_id != 1260704136475967498:
+            await interaction.response.send_message("Loyalty Missions can only be started from your Spaceship!", ephemeral=True)
+            return
+        
         # CHECK FOR RUNNING BOUNTIES NEEDED
         '''
         user = interaction.user

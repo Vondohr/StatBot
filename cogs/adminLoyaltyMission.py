@@ -69,12 +69,12 @@ class AdminLoyaltyMission(commands.Cog):
             if roles_to_remove:
                 try:
                     await member.remove_roles(*roles_to_remove, reason="Loyalty Mission ended.")
-                    affected.append(member.mention)
+                    affected.append(member.display_name)
                 except discord.Forbidden:
                     continue
 
         if affected:
-            messageString = f"Removed **{NARRATOR_ROLE_NAME}** and **{LOYALTY_ROLE_NAME}** roles from: {', '.join(affected)}"
+            messageString = f"Removed the '{NARRATOR_ROLE_NAME}' and '{LOYALTY_ROLE_NAME}' roles from: {', '.join(affected)}"
         else:
             messageString = f"No members in {spaceship} had any Loyalty Mission roles to remove."
 

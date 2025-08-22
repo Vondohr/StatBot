@@ -37,7 +37,7 @@ class LoyaltyMissionView(discord.ui.View):
             button.disabled = True
             await interaction.response.edit_message(view=self)
 
-            await interaction.response.send_message(
+            await interaction.channel.send(
                 f"✅ Loyalty Mission started! {self.author.mention} is now {narrator_role.mention}, and {self.target.mention} is now {loyalty_role.mention}."
             )
         except discord.Forbidden:

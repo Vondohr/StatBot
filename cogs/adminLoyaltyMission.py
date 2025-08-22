@@ -27,14 +27,14 @@ class AdminLoyaltyMission(commands.Cog):
             await interaction.response.send_message("Error: 'Crew Narrator' or 'Loyalty Marked' roles not found.", ephemeral=True)
             return
 
-        '''
-        spaceship_role = role
+        spaceship_role = spaceship
         parts = spaceship_role.split(" ", 1)
         if len(parts) != 2:
             await interaction.followup.send("Invalid spaceship role format.", ephemeral=True)
             return
         ship_key = parts[1].lower()
 
+        '''
         conn = sqlite3.connect("data/ship_data.db")
         cur = conn.cursor()
         
@@ -60,6 +60,8 @@ class AdminLoyaltyMission(commands.Cog):
         '''
 
         loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
+        if not loyalty_nicknames:
+            loyalty_nicknames = "nobody"
 
         affected = []
         for member in spaceship.members:
@@ -78,7 +80,7 @@ class AdminLoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title=f"Loyalty Mission Ended",
-            description=f"Loyalty Mission ended for the Crew of {spaceship}**\n\nOne Reroll rewarded to {loyalty_nicknames}!",
+            description=f"Loyalty Mission ended for the Crew of {spaceship}\n\n**One Reroll rewarded to {loyalty_nicknames}!**",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/6d3dfbf948c657abf2fa93c0ad0ff836/495d2ace7fab6c1a-03/s540x810/be49d7f4da569d2a61f6d0c5cb78e8c96b668c5a.gif")

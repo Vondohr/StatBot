@@ -32,6 +32,11 @@ class LoyaltyMissionView(discord.ui.View):
         try:
             await self.author.add_roles(narrator_role)
             await self.target.add_roles(loyalty_role)
+
+            # Disable the button
+            button.disabled = True
+            await interaction.response.edit_message(view=self)
+
             await interaction.response.send_message(
                 f"✅ Loyalty Mission started! {self.author.mention} is now {narrator_role.mention}, and {self.target.mention} is now {loyalty_role.mention}."
             )
@@ -54,7 +59,7 @@ class LoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title=f"Loyalty Mission",
-            description=f"Loyalty Mission prepared for {player.mention}. An Admin must start it.",
+            description=f"Loyalty Mission prepared for {player.mention}. A Narrator must start it.",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/18d4a604b3b44ff8c6d2556a8da8cb34/4c683c0be10a5deb-22/s500x750/84fa248322bdf0a4080354615487c08a0bb94817.gif")

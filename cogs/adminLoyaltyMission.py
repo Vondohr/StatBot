@@ -66,7 +66,7 @@ class AdminLoyaltyMission(commands.Cog):
                 loyalty_nicknames.append(member.display_name)
 
         if loyalty_nicknames:
-            rewardedString = f"One Reroll rewarded to {', '.join(loyalty_nicknames)}"
+            rewardedString = f"One Reroll rewarded to {', '.join(loyalty_nicknames)}!"
         else:
             rewardedString = f"No Rerolls rewarded!"
 
@@ -88,7 +88,7 @@ class AdminLoyaltyMission(commands.Cog):
 
         embed = discord.Embed(
             title=f"Loyalty Mission Ended",
-            description=f"Loyalty Mission has been completed for the Crew of {spaceship}\n\n**{rewardedString}**",
+            description=f"The Crew of {spaceship} has completed their loyalty mission.\n\n**{rewardedString}**",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/6d3dfbf948c657abf2fa93c0ad0ff836/495d2ace7fab6c1a-03/s540x810/be49d7f4da569d2a61f6d0c5cb78e8c96b668c5a.gif")

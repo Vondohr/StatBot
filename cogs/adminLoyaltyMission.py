@@ -11,8 +11,6 @@ ADMIN_ROLE_NAME = "Narrators"
 class AdminLoyaltyMission(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.tree.add_command(self.admin_loyalty_end, guild=discord.Object(id=1258379465919041589))
-
 
     @app_commands.command(name="admin_loyalty_end", description="End a Loyalty Mission for all members of a Crew.")
     @app_commands.describe(spaceship="The role of the Crew that finished the Loyalty Mission")
@@ -28,6 +26,38 @@ class AdminLoyaltyMission(commands.Cog):
         if not narrator_role or not loyalty_role:
             await interaction.response.send_message("Error: 'Crew Narrator' or 'Loyalty Marked' roles not found.", ephemeral=True)
             return
+
+        '''
+        spaceship_role = role
+        parts = spaceship_role.split(" ", 1)
+        if len(parts) != 2:
+            await interaction.followup.send("Invalid spaceship role format.", ephemeral=True)
+            return
+        ship_key = parts[1].lower()
+
+        conn = sqlite3.connect("data/ship_data.db")
+        cur = conn.cursor()
+        
+        cur.execute("SELECT active_bounty FROM ship_data WHERE id = ?", (ship_key,))
+        row = cur.fetchone()
+        if not row:
+            active_bounty = "undefined"
+        else:
+            active_bounty = row[3] if row[3] is not None else "undefined"
+
+        if active_bounty != "Loyalty Mission":
+            conn.close()
+            await interaction.followup.send("There was no Loyalty Mission running!", ephemeral=True)
+            return
+        else:
+            name_of_bounty = "undefined"
+            cur.execute(
+                "UPDATE ship_data SET active_bounty=? WHERE id=?",
+                (name_of_bounty, ship_key),
+            )
+            conn.commit()
+            conn.close()
+        '''
 
         loyalty_nicknames = [member.display_name for member in spaceship.members if loyalty_role in member.roles]
 

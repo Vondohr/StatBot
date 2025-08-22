@@ -13,6 +13,7 @@ class LoyaltyMissionAdmin(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="admin_loyalty_mission_end", description="End a Loyalty Mission for all members of a Crew.")
+    @app_commands.describe(role="The role of the Crew that finished the Loyalty Mission")
     async def admin_loyalty_mission_end(self, interaction: discord.Interaction, role: discord.Role):
         if not any(r.name == ADMIN_ROLE_NAME for r in interaction.user.roles):
             await interaction.response.send_message("You don't have permission to end this mission.", ephemeral=True)

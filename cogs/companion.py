@@ -89,6 +89,10 @@ class Companion(commands.Cog):
 
         view = CompanionView(user=interaction.user)
         await interaction.followup.send(embed=embed, view=view, ephemeral=hidden)
+        if "⏫" in interaction.channel.name:
+            await interaction.channel.send("Yep, I can see the character!")
+        else:
+            await interaction.channel.send("Nope!")
 
 
 # Register the command and view

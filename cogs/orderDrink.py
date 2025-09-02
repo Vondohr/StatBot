@@ -47,7 +47,7 @@ class DrinkButtons(discord.ui.View):
         await interaction.response.send_message("You clicked Drink 4!", ephemeral=True)
 
     # Button 5
-    @discord.ui.button(label=":cocktail: Fuzzy Tauntaun", style=discord.ButtonStyle.premium, custom_id="drink_5")
+    @discord.ui.button(label=":cocktail: Fuzzy Tauntaun", style=discord.ButtonStyle.primary, custom_id="drink_5")
     async def drink_5(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 5!", ephemeral=True)

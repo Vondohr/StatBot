@@ -9,7 +9,7 @@ class OrderDrinkCog(commands.Cog):
     # Slash command
     @app_commands.command(name="order_drink", description="Order a drink")
     async def order_drink(self, interaction: discord.Interaction):
-        if not "⏫" in interaction.channel.name or not interaction.channel.id == 1260348000316817501:
+        if not "🧉" in interaction.channel.name or interaction.channel.id != 1260348000316817501:
             await interaction.response.send_message("You cannot order a drink outside Cantinas!", ephemeral=True)
             return
         

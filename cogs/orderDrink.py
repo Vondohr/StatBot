@@ -23,31 +23,31 @@ class DrinkButtons(discord.ui.View):
         super().__init__(timeout=None)  # No timeout so buttons always work
 
     # Button 1
-    @discord.ui.button(label="Drink 1", style=discord.ButtonStyle.primary, custom_id="drink_1")
+    @discord.ui.button(label=":milk: Bantha Milk", style=discord.ButtonStyle.blurple, custom_id="drink_1")
     async def drink_1(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 1!", ephemeral=True)
 
     # Button 2
-    @discord.ui.button(label="Drink 2", style=discord.ButtonStyle.primary, custom_id="drink_2")
+    @discord.ui.button(label=":tea: Tarine Tea", style=discord.ButtonStyle.gray, custom_id="drink_2")
     async def drink_2(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 2!", ephemeral=True)
 
     # Button 3
-    @discord.ui.button(label="Drink 3", style=discord.ButtonStyle.primary, custom_id="drink_3")
+    @discord.ui.button(label=":wine_glass: Whyren’s Reserve", style=discord.ButtonStyle.red, custom_id="drink_3")
     async def drink_3(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 3!", ephemeral=True)
 
     # Button 4
-    @discord.ui.button(label="Drink 4", style=discord.ButtonStyle.primary, custom_id="drink_4")
+    @discord.ui.button(label=":beer: Skannbult Ale", style=discord.ButtonStyle.green, custom_id="drink_4")
     async def drink_4(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 4!", ephemeral=True)
 
     # Button 5
-    @discord.ui.button(label="Drink 5", style=discord.ButtonStyle.primary, custom_id="drink_5")
+    @discord.ui.button(label=":cocktail: Fuzzy Tauntaun", style=discord.ButtonStyle.premium, custom_id="drink_5")
     async def drink_5(self, interaction: discord.Interaction, button: discord.ui.Button):
         # TODO: implement action
         await interaction.response.send_message("You clicked Drink 5!", ephemeral=True)

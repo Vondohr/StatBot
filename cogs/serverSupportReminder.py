@@ -16,7 +16,7 @@ class WeeklyEmbed(commands.Cog):
     def create_embed(self):
         embed = discord.Embed(
             title="If you enjoy what this server offers, keep reading!",
-            description="Don't forget that you can support us here: https://discord.com/channels/1258379465919041589/1293211215262253097\n\nYou can:\n- Get a cool unicode icon for your Crew channel!\n- Get your own Opening Crawl\n- Gain access to an upper floor of Hunter's Bounty, with jukebox and other cool stuff!\n- Feel good that you supported something you like!\n",
+            description="Don't forget that you can support us here: https://discord.com/channels/1258379465919041589/1293211215262253097\n\nYou can:\n- Get a cool unicode icon for your Crew channel!\n- Get your own Opening Crawl\n- Gain access to an upper floor of Hunter's Bounty, with jukebox and other cool stuff!\n- Get insider info about what features are coming next\n- Feel good that you supported something you like!\n",
             color=discord.Color.gold()
         )
         embed.set_image(url="https://c.tenor.com/nwBMOVfhuS0AAAAC/tenor.gif")

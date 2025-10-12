@@ -40,7 +40,8 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
             # Remove spaceship role if present
             spaceship_role = next((role for role in roles if role.name.startswith("Spaceship")), None)
             if spaceship_role:
-                await interaction.user.remove_roles(spaceship_role)
+                crew_role = discord.utils.get(interaction.guild.roles, name="Crew")
+                await interaction.user.remove_roles(spaceship_role, crew_role)
             else:
                 await interaction.followup.send("You are not in a spaceship!", ephemeral=True)
         else:

@@ -69,6 +69,7 @@ class LeaveCrew(commands.Cog):
             await interaction.response.send_message("You are in no Crew!", ephemeral=True)
             return
 
+        '''
         if any(role.name == "Crew Narrator" for role in roles):
             await interaction.response.send_message("You are Narrating a Loyalty Mission. Finish it first!", ephemeral=True)
             return
@@ -76,7 +77,8 @@ class LeaveCrew(commands.Cog):
         if any(role.name == "Loyalty Marked" for role in roles):
             await interaction.response.send_message("You are on a Loyalty Mission. Finish it first!", ephemeral=True)
             return
-
+        '''
+            
         # Show the modal
         modal = LeaveCrewModal(interaction.user)
         await interaction.response.send_modal(modal)

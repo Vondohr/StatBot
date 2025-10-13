@@ -9,7 +9,7 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
         super().__init__()
         self.user = user
         self.confirmation = discord.ui.TextInput(
-            label='Type "Yes" below to confirm. Remember that you will lose all the Rerolls gained through Loyalty Missions with this Crew.',
+            label='Type "Yes" below to confirm. All Rerolls will be lost.',
             placeholder='Yes',
             required=True,
             max_length=3

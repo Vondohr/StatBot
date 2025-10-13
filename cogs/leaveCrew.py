@@ -80,9 +80,9 @@ class LeaveCrew(commands.Cog):
             
         # Show the modal
         modal = LeaveCrewModal(interaction.user)
-        print("Preparing to send modal...")
+        await interaction.channel.send("Preparing to send modal...")
         await interaction.response.send_modal(modal)
-        print("Modal sent...")
+        await interaction.channel.send("Modal sent...")
 
 
 async def setup(bot: commands.Bot):

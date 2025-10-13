@@ -24,9 +24,10 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
             # Announce departure
             embed = discord.Embed(
                 title="Crew Departure",
-                description=f"{self.user.mention} has left their crew.",
+                description=f"{self.user.mention} has left the Crew.",
                 color=discord.Color.red()
             )
+            embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1427237203708350544/CrewLeaving.gif")
             await interaction.response.send_message(embed=embed)
 
             await asyncio.sleep(10)

@@ -9,7 +9,7 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
         super().__init__()
         self.user = user
         self.confirmation = discord.ui.TextInput(
-            label='Type "Yes" to confirm. Remember that you will lose all the Rerolls gained through Loyalty Missions with this Crew.',
+            label='Type "Yes" below to confirm. Remember that you will lose all the Rerolls gained through Loyalty Missions with this Crew.',
             placeholder='Yes',
             required=True,
             max_length=3
@@ -17,6 +17,9 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
         self.add_item(self.confirmation)
 
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        
+        '''
         if self.confirmation.value.strip().lower() == "yes":
             roles = interaction.user.roles
             is_on_location = any(role.name.startswith(("Planet", "Moon")) for role in roles)
@@ -46,6 +49,7 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
                 await interaction.followup.send("You are not in a spaceship!", ephemeral=True)
         else:
             await interaction.response.defer(ephemeral=True)
+        '''
 
 
 class LeaveCrew(commands.Cog):

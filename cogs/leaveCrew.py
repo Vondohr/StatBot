@@ -91,7 +91,8 @@ class LeaveCrew(commands.Cog):
             return
             
         # Show the modal
-        modal = LeaveCrewModal(interaction.user)
+        # modal = LeaveCrewModal(interaction.user)
+        modal = LeaveCrewModal()
         await interaction.channel.send("Preparing to send modal...")
         await interaction.response.send_modal(modal)
         await interaction.channel.send("Modal sent...")

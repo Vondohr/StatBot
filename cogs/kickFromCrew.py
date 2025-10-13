@@ -81,7 +81,7 @@ class KickFromCrew(commands.Cog):
 
         if author_ship != target_ship:
             await interaction.response.send_message(
-                f"{member.mention} is not part of your Crew (different Spaceship).",
+                f"{member.mention} is not part of your Crew!",
                 ephemeral=True
             )
             return

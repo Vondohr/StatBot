@@ -4,17 +4,6 @@ from discord import app_commands
 from discord.ext import commands
 
 
-class LeaveCrewModal(discord.ui.Modal, title="Test Modal"):
-    def __init__(self):
-        super().__init__()
-        self.input = discord.ui.TextInput(label="Say something")
-        self.add_item(self.input)
-
-    async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f"You said: {self.input.value}", ephemeral=True)
-
-
-'''
 class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
     def __init__(self, user: discord.Member):
         super().__init__()
@@ -57,7 +46,6 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
                 await interaction.followup.send("You are not in a spaceship!", ephemeral=True)
         else:
             await interaction.response.defer(ephemeral=True)
-'''
 
 
 class LeaveCrew(commands.Cog):
@@ -91,11 +79,8 @@ class LeaveCrew(commands.Cog):
             return
             
         # Show the modal
-        # modal = LeaveCrewModal(interaction.user)
-        modal = LeaveCrewModal()
-        await interaction.channel.send("Preparing to send modal...")
+        modal = LeaveCrewModal(interaction.user)
         await interaction.response.send_modal(modal)
-        await interaction.channel.send("Modal sent...")
 
 
 async def setup(bot: commands.Bot):

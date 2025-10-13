@@ -17,8 +17,6 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
         self.user = user
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer(thinking=True)
-        
         if self.confirmation.value.strip().lower() == "yes":
             roles = interaction.user.roles
             is_on_location = any(role.name.startswith(("Planet", "Moon")) for role in roles)
@@ -59,6 +57,7 @@ class LeaveCrew(commands.Cog):
         roles = interaction.user.roles
         allowed_category_name = "「🌀」Crews【Spaceships】"
 
+        '''
         # Channel category check
         if interaction.channel.category is None or interaction.channel.category.name != allowed_category_name:
             await interaction.response.send_message(
@@ -79,7 +78,8 @@ class LeaveCrew(commands.Cog):
         if any(role.name == "Loyalty Marked" for role in roles):
             await interaction.response.send_message("You are on a Loyalty Mission. Finish it first!", ephemeral=True)
             return
-            
+        '''
+                
         # Show the modal
         modal = LeaveCrewModal(interaction.user)
         await interaction.response.send_modal(modal)

@@ -5,16 +5,16 @@ from discord.ext import commands
 
 
 class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
-    confirmation = discord.ui.TextInput(
-        label='Type "Yes" to confirm. Remember that you will lose all the Rerolls gained through Loyalty Missions with this Crew.',
-        placeholder='Yes',
-        required=True,
-        max_length=3
-    )
-
     def __init__(self, user: discord.Member):
         super().__init__()
         self.user = user
+        self.confirmation = discord.ui.TextInput(
+            label='Type "Yes" to confirm. Remember that you will lose all the Rerolls gained through Loyalty Missions with this Crew.',
+            placeholder='Yes',
+            required=True,
+            max_length=3
+        )
+        self.add_item(self.confirmation)
 
     async def on_submit(self, interaction: discord.Interaction):
         if self.confirmation.value.strip().lower() == "yes":
@@ -57,7 +57,6 @@ class LeaveCrew(commands.Cog):
         roles = interaction.user.roles
         allowed_category_name = "「🌀」Crews【Spaceships】"
 
-        '''
         # Channel category check
         if interaction.channel.category is None or interaction.channel.category.name != allowed_category_name:
             await interaction.response.send_message(
@@ -78,8 +77,7 @@ class LeaveCrew(commands.Cog):
         if any(role.name == "Loyalty Marked" for role in roles):
             await interaction.response.send_message("You are on a Loyalty Mission. Finish it first!", ephemeral=True)
             return
-        '''
-                
+            
         # Show the modal
         modal = LeaveCrewModal(interaction.user)
         await interaction.response.send_modal(modal)

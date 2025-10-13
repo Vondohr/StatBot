@@ -17,9 +17,6 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
         self.add_item(self.confirmation)
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        
-        '''
         if self.confirmation.value.strip().lower() == "yes":
             roles = interaction.user.roles
             is_on_location = any(role.name.startswith(("Planet", "Moon")) for role in roles)
@@ -49,7 +46,6 @@ class LeaveCrewModal(discord.ui.Modal, title="Confirm Leaving Crew"):
                 await interaction.followup.send("You are not in a spaceship!", ephemeral=True)
         else:
             await interaction.response.defer(ephemeral=True)
-        '''
 
 
 class LeaveCrew(commands.Cog):
@@ -84,7 +80,9 @@ class LeaveCrew(commands.Cog):
             
         # Show the modal
         modal = LeaveCrewModal(interaction.user)
+        print("Preparing to send modal...")
         await interaction.response.send_modal(modal)
+        print("Modal sent...")
 
 
 async def setup(bot: commands.Bot):

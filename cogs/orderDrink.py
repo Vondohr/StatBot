@@ -1,3 +1,4 @@
+import random
 import sqlite3
 
 import discord
@@ -55,7 +56,7 @@ class OrderDrinkCog(commands.Cog):
         
         embed = discord.Embed(
             title="🍹 Order a Drink",
-            description="Choose your drink by clicking one of the buttons below.",
+            description="Choose your drink by clicking one of the buttons below.\n\n**The Galaxy's Usuals**\n- **🍺 Skannbult Ale** - A cheap beverage, safe to drink.\n- **🍸 Fuzzy Tauntaun** - A **small chance** to get a bonus or debuff to Rolls.\n- **🍷 Whyren’s Reserve** - A **big chance** to get a bonus or debuff to Rolls.\n- **🥛 Bantha Milk** - A **small chance** to get a **BIG bonus** to Rolls, with a **BIG chance** to get a **BIG debuff** to Rolls.",
             color=discord.Color.blurple()
         )
         embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1427992029601857626/DrinkingObiWan.gif")
@@ -90,17 +91,19 @@ class DrinkButtons(discord.ui.View):
     @discord.ui.button(label="🥛 Bantha Milk | 200 ᖬ", style=discord.ButtonStyle.blurple, custom_id="milk")
     async def milk(self, interaction: discord.Interaction, button: discord.ui.Button):
         if "Player" not in [r.name for r in interaction.user.roles]:
-            await interaction.response.send_message("You don't have a Character!", ephemeral=True)
+            await interaction.response.send_message("You don't have a Character! Create one first.", ephemeral=True)
             return
         
         # TODO: implement action
+        randomResult = random.randint(1, 10)
+
         await interaction.response.send_message("You clicked Drink 1!", ephemeral=True)
 
     # Button 3
     @discord.ui.button(label="🍸 Fuzzy Tauntaun | 1 000 ᖬ", style=discord.ButtonStyle.green, custom_id="tauntaun")
     async def tauntaun(self, interaction: discord.Interaction, button: discord.ui.Button):
         if "Player" not in [r.name for r in interaction.user.roles]:
-            await interaction.response.send_message("You don't have a Character!", ephemeral=True)
+            await interaction.response.send_message("You don't have a Character! Create one first.", ephemeral=True)
             return
         
         # TODO: implement action
@@ -110,7 +113,7 @@ class DrinkButtons(discord.ui.View):
     @discord.ui.button(label="🍷 Whyren’s Reserve | 3 000 ᖬ", style=discord.ButtonStyle.red, custom_id="whyren")
     async def whyren(self, interaction: discord.Interaction, button: discord.ui.Button):
         if "Player" not in [r.name for r in interaction.user.roles]:
-            await interaction.response.send_message("You don't have a Character!", ephemeral=True)
+            await interaction.response.send_message("You don't have a Character! Create one first.", ephemeral=True)
             return
         
         # TODO: implement action

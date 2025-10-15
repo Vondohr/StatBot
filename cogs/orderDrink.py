@@ -59,7 +59,7 @@ class OrderDrinkCog(commands.Cog):
             description="Choose your drink by clicking one of the buttons below.\n\n**The Galaxy's Usuals**\n- **🍺 Skannbult Ale** - A cheap beverage, safe to drink.\n- **🍸 Fuzzy Tauntaun** - A **small chance** to get a bonus or debuff to Rolls.\n- **🍷 Whyren’s Reserve** - A **big chance** to get a bonus or debuff to Rolls.\n- **🥛 Bantha Milk** - A **small chance** to get a **BIG bonus** to Rolls, with a **BIG chance** to get a **BIG debuff** to Rolls.",
             color=discord.Color.blurple()
         )
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1427992029601857626/DrinkingObiWan.gif")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428000979533434981/DrinkingObiWan.gif")
 
         view = DrinkButtons()
         await interaction.response.send_message(embed=embed, view=view)
@@ -82,7 +82,7 @@ class DrinkButtons(discord.ui.View):
             description="You enjoy this cheap beverage!",
             color=discord.Color.light_gray()
         )
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1427992029056467026/MilkDrinking.gif")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428000979122524172/MilkDrinking.gif")
         embed.set_footer(text="It cost 50 ᖬ!")
 
         await interaction.response.send_message(embed=embed)
@@ -97,7 +97,7 @@ class DrinkButtons(discord.ui.View):
         # TODO: implement action
         randomResult = random.randint(1, 10)
 
-        await interaction.response.send_message("You clicked Drink 1!", ephemeral=True)
+        await interaction.response.send_message(f"Bantha Milk! {randomResult}", ephemeral=True)
 
     # Button 3
     @discord.ui.button(label="🍸 Fuzzy Tauntaun | 1 000 ᖬ", style=discord.ButtonStyle.green, custom_id="tauntaun")
@@ -107,7 +107,9 @@ class DrinkButtons(discord.ui.View):
             return
         
         # TODO: implement action
-        await interaction.response.send_message("You clicked Drink 2!", ephemeral=True)
+        randomResult = random.randint(1, 10)
+
+        await interaction.response.send_message(f"Fuzzy Tauntaun! {randomResult}", ephemeral=True)
 
     # Button 4
     @discord.ui.button(label="🍷 Whyren’s Reserve | 3 000 ᖬ", style=discord.ButtonStyle.red, custom_id="whyren")
@@ -117,7 +119,9 @@ class DrinkButtons(discord.ui.View):
             return
         
         # TODO: implement action
-        await interaction.response.send_message("You clicked Drink 3!", ephemeral=True)
+        randomResult = random.randint(1, 10)
+
+        await interaction.response.send_message(f"Whyren's Reserve! {randomResult}", ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(OrderDrinkCog(bot))

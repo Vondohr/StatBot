@@ -8,7 +8,6 @@ from discord import app_commands
 class OrderDrinkCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        '''
         iconn = sqlite3.connect("data/character_data/inventory.db")
         icur = iconn.cursor()
         icur.execute(
@@ -45,13 +44,11 @@ class OrderDrinkCog(commands.Cog):
         )
         aconn.commit()
         aconn.close()
-        '''
 
-    # Slash command
-    @app_commands.command(name="order_drink", description="Order a drink")
+    @app_commands.command(name="order_drink_testing", description="Order a drink")
     async def order_drink(self, interaction: discord.Interaction):
         if not "🧉" in interaction.channel.name:
-            await interaction.response.send_message("You cannot order a drink outside Cantinas!", ephemeral=True)
+            await interaction.response.send_message("You cannot order a drink outside Cantinas!", ephemeral=False)
             return
         
         embed = discord.Embed(
@@ -62,7 +59,7 @@ class OrderDrinkCog(commands.Cog):
         embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008654174552147/BarDefault.gif")
 
         view = DrinkButtons()
-        await interaction.response.send_message(embed=embed, view=view)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 class DrinkButtons(discord.ui.View):
     def __init__(self):
@@ -106,6 +103,12 @@ class DrinkButtons(discord.ui.View):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655193641031/DrinkSuccess.gif")
             embed.set_footer(text="It cost 200 ᖬ!")
 
+            nameBonus = "Bantha Milk"
+            descBonus = "Adds 1 side to the Die for your next Roll"
+            bonusMin = 0
+            bonusMax = 1
+            uses = 1
+
         elif randomResult == 3:
             embed = discord.Embed(
             title=f"**{interaction.user.display_name}** ordered the **🥛 Bantha Milk!**",
@@ -114,6 +117,12 @@ class DrinkButtons(discord.ui.View):
             )
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008654774472704/DrinkWrong.gif")
             embed.set_footer(text="It cost 200 ᖬ!")
+
+            nameBonus = "Bantha Milk"
+            descBonus = "Removes 1 side to the Die for your next Roll"
+            bonusMin = 0
+            bonusMax = -1
+            uses = 1
 
         else:
             embed = discord.Embed(
@@ -124,7 +133,11 @@ class DrinkButtons(discord.ui.View):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655772713050/DrinkDefault.gif")
             embed.set_footer(text="It cost 200 ᖬ!")
 
+            nameBonus = "None"
+
         await interaction.response.send_message(embed=embed)
+        if nameBonus != "None":
+            await self.handle_bonus(interaction, nameBonus, descBonus, bonusMin, bonusMax, uses)
 
     # Button 3
     @discord.ui.button(label="🍸 Fuzzy Tauntaun | 1 000 ᖬ", style=discord.ButtonStyle.green, custom_id="tauntaun")
@@ -145,6 +158,12 @@ class DrinkButtons(discord.ui.View):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655193641031/DrinkSuccess.gif")
             embed.set_footer(text="It cost 1 000 ᖬ!")
 
+            nameBonus = "Fuzzy Tauntaun"
+            descBonus = "Adds 2 sides to the Die for your next Roll"
+            bonusMin = 0
+            bonusMax = 2
+            uses = 1
+
         elif randomResult >= 4 and randomResult <= 6:
             embed = discord.Embed(
             title=f"**{interaction.user.display_name}** ordered the **🍸 Fuzzy Tauntaun!**",
@@ -153,6 +172,12 @@ class DrinkButtons(discord.ui.View):
             )
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008654774472704/DrinkWrong.gif")
             embed.set_footer(text="It cost 1 000 ᖬ!")
+
+            nameBonus = "Fuzzy Tauntaun"
+            descBonus = "Removes 2 sides to the Die for your next Roll"
+            bonusMin = 0
+            bonusMax = -2
+            uses = 1
 
         else:
             embed = discord.Embed(
@@ -163,7 +188,11 @@ class DrinkButtons(discord.ui.View):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655772713050/DrinkDefault.gif")
             embed.set_footer(text="It cost 1 000 ᖬ!")
 
+            nameBonus = "None"
+
         await interaction.response.send_message(embed=embed)
+        if nameBonus != "None":
+            await self.handle_bonus(interaction, nameBonus, descBonus, bonusMin, bonusMax, uses)
 
     # Button 4
     @discord.ui.button(label="🍷 Whyren’s Reserve | 3 000 ᖬ", style=discord.ButtonStyle.red, custom_id="whyren")
@@ -183,6 +212,12 @@ class DrinkButtons(discord.ui.View):
             )
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655193641031/DrinkSuccess.gif")
             embed.set_footer(text="It cost 3 000 ᖬ!")
+            
+            nameBonus = "Whyren’s Reserve"
+            descBonus = "Adds 3 sides to the Die for your next 2 Rolls"
+            bonusMin = 0
+            bonusMax = 3
+            uses = 2
 
         elif randomResult >= 2 and randomResult <= 8:
             embed = discord.Embed(
@@ -193,6 +228,12 @@ class DrinkButtons(discord.ui.View):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008654774472704/DrinkWrong.gif")
             embed.set_footer(text="It cost 3 000 ᖬ!")
 
+            nameBonus = "Whyren’s Reserve"
+            descBonus = "Removes 3 sides to the Die for your next 2 Rolls"
+            bonusMin = 0
+            bonusMax = -3
+            uses = 2
+
         else:
             embed = discord.Embed(
             title=f"**{interaction.user.display_name}** ordered the **🍷 Whyren’s Reserve!**",
@@ -201,8 +242,37 @@ class DrinkButtons(discord.ui.View):
             )
             embed.set_image(url="https://cdn.discordapp.com/attachments/1422602593179271189/1428008655772713050/DrinkDefault.gif")
             embed.set_footer(text="It cost 3 000 ᖬ!")
+            
+            nameBonus = "None"
 
         await interaction.response.send_message(embed=embed)
+        if nameBonus != "None":
+            await self.handle_bonus(interaction, nameBonus, descBonus, bonusMin, bonusMax, uses)
+    
+    async def handle_bonus(self, interaction: discord.Interaction, nameBonus: str, descBonus: str, bonusMin: int, bonusMax: int, uses: int):
+        uid = str(interaction.user.id)
+        
+        aconn = sqlite3.connect("data/character_data/activeBonuses.db")
+        acur = aconn.cursor()
+
+        cur = aconn.execute(
+            "SELECT 1 FROM activeBonuses WHERE Owner = ? AND Name = ?",
+            (uid, nameBonus),
+        )
+        if cur.fetchone():
+            aconn.close()
+            await interaction.followup.send("This bonus/debuff is already active!", ephemeral=True)
+            return
+
+        acur.execute(
+            """
+            INSERT INTO activeBonuses (Owner, Name, Description, BonusMin, BonusMax, Uses)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (uid, nameBonus, descBonus, bonusMin, bonusMax, uses),
+        )
+        aconn.commit()
+        aconn.close()
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(OrderDrinkCog(bot))

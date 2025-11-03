@@ -65,7 +65,8 @@ class CharacterEmbedTesting(commands.Cog):
         async for message in thread.history(limit=None, oldest_first=True):  # no limit now
             if str(user_id_int) in message.content:
                 for attachment in message.attachments:
-                    if attachment.url.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+                    url_no_query = attachment.url.split("?", 1)[0]
+                    if url_no_query.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
                         # Example: ..._TopSupporter.gif
                         if f"_{stringToSearch.lower()}" in attachment.url.lower():
                             imageURL = attachment.url

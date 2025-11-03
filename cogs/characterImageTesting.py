@@ -51,25 +51,27 @@ class CharacterEmbedTesting(commands.Cog):
 
         if interaction.guild.get_role(ultraSupporterRoleID) in member.roles:
             stringToSearch = "UltraSupporter"
-        elif interaction.guild.get_role(topSupporterRoleID) in member.roles:
-            stringToSearch = "TopSupporter"
-        elif interaction.guild.get_role(serverBoosterRoleID) in member.roles:
+        elif (
+            interaction.guild.get_role(topSupporterRoleID) in member.roles
+            or interaction.guild.get_role(serverBoosterRoleID) in member.roles
+        ):
             stringToSearch = "TopSupporter"
         elif interaction.guild.get_role(supporterRoleID) in member.roles:
             stringToSearch = "Supporter"
 
         imageURL = None
 
-        async for message in thread.history(limit=200, oldest_first=True):
+        # Search through the thread
+        async for message in thread.history(limit=None, oldest_first=True):  # no limit now
             if str(user_id_int) in message.content:
                 for attachment in message.attachments:
                     if attachment.url.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+                        # Example: ..._TopSupporter.gif
                         if f"_{stringToSearch.lower()}" in attachment.url.lower():
                             imageURL = attachment.url
                             break
                 if imageURL:
-                    break  # Stop once we found the correct image
-
+                    break
             await asyncio.sleep(0.05)
 
         # If nothing found, use default images based on supporter type

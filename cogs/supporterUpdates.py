@@ -61,9 +61,9 @@ class SupportersList(commands.Cog):
         embed = discord.Embed(
             title=title,
             description=description,
-            color=0x2b2d31
+            color=0x006FFF
         )
-        embed.set_thumbnail(url=image_url)
+        embed.set_image(url=image_url)
         return embed
 
     # ---------------------------
@@ -90,7 +90,7 @@ class SupportersList(commands.Cog):
         # Prepare embeds
         embeds = {
             "ultra": self.create_embed("Ultra Supporters", ultra_members, ULTRA_IMAGE_URL),
-            "top": self.create_embed("Top Supporters (Top Supporter + Server Boosters)", top_members, TOP_IMAGE_URL),
+            "top": self.create_embed("Top Supporters (+ Server Boosters)", top_members, TOP_IMAGE_URL),
             "supporter": self.create_embed("Supporters", supporter_members, SUPPORTER_IMAGE_URL),
         }
 

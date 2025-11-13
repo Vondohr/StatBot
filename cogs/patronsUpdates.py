@@ -152,7 +152,6 @@ class Supporters(commands.Cog):
 
     # ---------- SLASH COMMAND ----------
     @app_commands.command(name="refresh_supporters", description="Manually refresh the supporter embeds.")
-    @app_commands.checks.has_permissions(manage_guild=True)
     async def refresh_supporters(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         await self.update_all_embeds()

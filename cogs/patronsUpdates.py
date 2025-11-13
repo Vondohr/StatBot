@@ -58,21 +58,8 @@ class Supporters(commands.Cog):
 
     # ---------- STARTUP ----------
     async def cog_load(self):
-        # Wait for bot ready, ensure embeds exist and register app command
         await self.bot.wait_until_ready()
         await self.ensure_embeds_exist()
-
-        # Ensure the slash command is registered in the tree and synced
-        # (this helps the command appear reliably)
-        try:
-            # Add the command to the tree only if not present
-            if not self.bot.tree.get_command("refresh_supporters"):
-                self.bot.tree.add_command(self.refresh_supporters)
-            # Sync command tree so the command becomes visible
-            await self.bot.tree.sync()
-        except Exception as e:
-            # Do not crash startup if sync fails; log for debugging
-            print(f"[Supporters] Failed to register/sync app command: {e}")
 
     async def ensure_embeds_exist(self):
         """Make sure the thank-you channel contains all embeds."""
@@ -81,8 +68,7 @@ class Supporters(commands.Cog):
             print(f"[Supporters] Channel {self.channel_id} not found.")
             return
 
-        # Collect recent messages to look for existing embeds with titles
-        messages = [m async for m in channel.history(limit=50)]
+        messages = [m async for m in channel.history(limit=10)]
         found_titles = {m.embeds[0].title: m for m in messages if m.embeds}
 
         updated = False
@@ -94,8 +80,6 @@ class Supporters(commands.Cog):
                 try:
                     msg = await channel.fetch_message(data["message_id"])
                 except discord.NotFound:
-                    msg = None
-                except discord.Forbidden:
                     msg = None
 
             # Try to find by title if no valid message found
@@ -162,8 +146,6 @@ class Supporters(commands.Cog):
             new_msg = await channel.send(embed=embed)
             data["message_id"] = new_msg.id
             self.save_message_ids()
-        except discord.Forbidden:
-            print(f"[Supporters] Missing permissions to fetch/edit messages in channel {self.channel_id}.")
 
     # ---------- EVENTS ----------
     @commands.Cog.listener()
@@ -185,33 +167,13 @@ class Supporters(commands.Cog):
         await self.update_all_embeds()
         await interaction.followup.send("✅ Supporter embeds have been refreshed!", ephemeral=True)
 
-    # ---------- APP COMMAND ERROR HANDLING ----------
-    async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        """
-        Cog-level handler for app command errors.
-        This handles MissingPermissions for the refresh command and logs other errors.
-        """
-        # MissingPermissions raised by app_commands.checks(has_permissions=...) lands here
-        if isinstance(error, app_commands.MissingPermissions):
-            try:
-                await interaction.response.send_message("🚫 You don't have permission to use this command.", ephemeral=True)
-            except Exception:
-                # Interaction may already be responded to; attempt followup
-                try:
-                    await interaction.followup.send("🚫 You don't have permission to use this command.", ephemeral=True)
-                except Exception:
-                    pass
-            return
-
-        # Fallback: log and (if possible) notify caller
-        print(f"[Supporters] App command error: {error}")
-        try:
-            await interaction.response.send_message("⚠️ An error occurred while executing the command.", ephemeral=True)
-        except Exception:
-            try:
-                await interaction.followup.send("⚠️ An error occurred while executing the command.", ephemeral=True)
-            except Exception:
-                pass
+    @refresh_supporters.error
+    async def refresh_supporters_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, app_commands.errors.MissingPermissions):
+            await interaction.response.send_message("🚫 You don't have permission to use this command.", ephemeral=True)
+        else:
+            await interaction.response.send_message("⚠️ An error occurred while refreshing.", ephemeral=True)
+            raise error
 
 async def setup(bot):
     await bot.add_cog(Supporters(bot))

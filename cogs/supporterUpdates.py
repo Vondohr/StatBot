@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands, tasks
+from datetime import datetime, time, timedelta
+import asyncio
 
 # =======================
 # CONFIGURATION SECTION
@@ -13,7 +15,7 @@ ROLE_TOP = "Top Supporter"
 ROLE_BOOSTER = "Server Booster"
 ROLE_SUPPORTER = "Supporter"
 
-# Embed images (PUT YOUR URLs HERE)
+# Embed images
 ULTRA_IMAGE_URL = "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607000547480/UltraSupporter.gif"
 TOP_IMAGE_URL = "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607398875246/TopSupporter.gif"
 SUPPORTER_IMAGE_URL = "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607801794580/Supporter.gif"
@@ -22,33 +24,21 @@ SUPPORTER_IMAGE_URL = "https://cdn.discordapp.com/attachments/142260209426288245
 class SupportersList(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-        # Store sent embed message IDs (in-memory)
-        self.message_ids = {
-            "ultra": None,
-            "top": None,
-            "supporter": None
-        }
-
-        self.update_supporter_lists.start()
+        self.daily_update_loop.start()
 
     def cog_unload(self):
-        self.update_supporter_lists.cancel()
+        self.daily_update_loop.cancel()
 
     # ---------------------------
     # Helper: Get all members for one or more roles
-    # This version checks an explicit members list (fetched from API)
     # ---------------------------
     def get_members_with_role(self, members_list, role_names):
         role_names_set = set(role_names)
         matched = []
-
         for member in members_list:
-            # Compare role names (safer than role objects when caching is weird)
             member_role_names = {r.name for r in member.roles}
             if member_role_names & role_names_set:
                 matched.append(member)
-
         return sorted(matched, key=lambda m: m.name.lower())
 
     # ---------------------------
@@ -69,83 +59,65 @@ class SupportersList(commands.Cog):
         return embed
 
     # ---------------------------
-    # Background update loop (runs every 20 seconds)
+    # Task: update all embeds once per day at noon
     # ---------------------------
-    @tasks.loop(seconds=20)
-    async def update_supporter_lists(self):
-        await self.bot.wait_for("ready")
+    @tasks.loop(minutes=1)
+    async def daily_update_loop(self):
+        now = datetime.now()
+        if now.time().hour == 12 and now.time().minute == 0:
+            await self.update_supporter_embeds()
 
-        if not self.bot.guilds:
-            return
-
+    async def update_supporter_embeds(self):
+        await self.bot.wait_until_ready()
         guild = self.bot.guilds[0]
         channel = guild.get_channel(SUPPORTER_CHANNEL_ID)
         if channel is None:
             print("❌ Supporter channel not found!")
             return
 
-        # ---------- CRITICAL CHANGE ----------
-        # Fetch the full, current member list from the API to avoid stale cache issues.
-        # This ensures manual role edits are reflected reliably.
+        # Fetch all members to avoid cache issues
         try:
             members = [m async for m in guild.fetch_members(limit=None)]
         except Exception:
-            # Fallback to cached members if fetch fails for any reason
             members = list(guild.members)
 
-        # Collect role-based member lists (using the fetched members)
+        # Prepare member lists
         ultra_members = self.get_members_with_role(members, [ROLE_ULTRA])
         top_members = self.get_members_with_role(members, [ROLE_TOP, ROLE_BOOSTER])
         supporter_members = self.get_members_with_role(members, [ROLE_SUPPORTER])
 
         # Prepare embeds
-        embeds = {
-            "ultra": self.create_embed("Ultra Supporters", ultra_members, ULTRA_IMAGE_URL),
-            "top": self.create_embed("Top Supporters (+ Server Boosters)", top_members, TOP_IMAGE_URL),
-            "supporter": self.create_embed("Supporters", supporter_members, SUPPORTER_IMAGE_URL),
+        embeds_data = {
+            "Ultra Supporters": self.create_embed("Ultra Supporters", ultra_members, ULTRA_IMAGE_URL),
+            "Top Supporters (+ Server Boosters)": self.create_embed("Top Supporters (+ Server Boosters)", top_members, TOP_IMAGE_URL),
+            "Supporters": self.create_embed("Supporters", supporter_members, SUPPORTER_IMAGE_URL),
         }
 
-        # Update or recreate messages
-        for key, embed in embeds.items():
-            msg_id = self.message_ids[key]
+        # Fetch all messages in the channel
+        try:
+            messages = [m async for m in channel.history(limit=200)]
+        except Exception as e:
+            print("Error fetching messages:", e)
+            return
 
-            if msg_id is None:
-                # First-time creation
-                msg = await channel.send(embed=embed)
-                self.message_ids[key] = msg.id
-                continue
-
-            # Try editing
-            try:
-                msg = await channel.fetch_message(msg_id)
-                await msg.edit(embed=embed)
-            except discord.NotFound:
-                # If deleted, recreate
-                msg = await channel.send(embed=embed)
-                self.message_ids[key] = msg.id
-
-    # ---------------------------
-    # Listeners: trigger auto-refresh
-    # ---------------------------
-    @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        # Compare role names sets to detect role changes
-        before_set = {r.name for r in before.roles}
-        after_set = {r.name for r in after.roles}
-
-        tracked = {ROLE_ULTRA, ROLE_TOP, ROLE_BOOSTER, ROLE_SUPPORTER}
-
-        if tracked & (before_set ^ after_set):
-            # immediate refresh (the background loop will do the heavy lifting)
-            self.update_supporter_lists.restart()
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        self.update_supporter_lists.restart()
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        self.update_supporter_lists.restart()
+        # Match embeds by title and edit them
+        for title, embed in embeds_data.items():
+            msg_to_edit = None
+            for msg in messages:
+                if msg.embeds and msg.embeds[0].title == title:
+                    msg_to_edit = msg
+                    break
+            if msg_to_edit:
+                try:
+                    await msg_to_edit.edit(embed=embed)
+                except Exception as e:
+                    print(f"Failed to edit embed '{title}': {e}")
+            else:
+                # If embed with title doesn't exist, send it
+                try:
+                    await channel.send(embed=embed)
+                except Exception as e:
+                    print(f"Failed to send embed '{title}': {e}")
 
 
 async def setup(bot):

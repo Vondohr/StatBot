@@ -5,7 +5,7 @@ import json
 import os
 
 class Supporters(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.channel_id = 1438517684470939829
         self.data_file = "supporter_embeds.json"
@@ -16,19 +16,19 @@ class Supporters(commands.Cog):
                 "roles": ["Ultra Supporter"],
                 "color": discord.Color.gold(),
                 "image_url": "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607000547480/UltraSupporter.gif",
-                "message_id": None
+                "message_id": None,
             },
             "Top Supporters & Boosters": {
                 "roles": ["Top Supporter", "Server Booster"],
                 "color": discord.Color.blurple(),
                 "image_url": "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607398875246/TopSupporter.gif",
-                "message_id": None
+                "message_id": None,
             },
             "Supporters": {
                 "roles": ["Supporter"],
                 "color": discord.Color.green(),
                 "image_url": "https://cdn.discordapp.com/attachments/1422602094262882457/1434843607801794580/Supporter.gif",
-                "message_id": None
+                "message_id": None,
             },
         }
 
@@ -56,17 +56,28 @@ class Supporters(commands.Cog):
 
     # ---------- STARTUP ----------
     async def cog_load(self):
+        # Wait until bot caches guilds/channels and is ready
         await self.bot.wait_until_ready()
         await self.ensure_embeds_exist()
 
     async def ensure_embeds_exist(self):
         channel = self.bot.get_channel(self.channel_id)
         if not channel:
-            print(f"[Supporters] Channel {self.channel_id} not found.")
+            print(f"[Supporters] Channel {self.channel_id} not found or not cached. Check bot permissions and channel ID.")
             return
 
-        messages = [m async for m in channel.history(limit=10)]
-        found_titles = {m.embeds[0].title: m for m in messages if m.embeds}
+        # Safely fetch recent messages with embeds
+        try:
+            messages = [m async for m in channel.history(limit=10)]
+        except Exception as e:
+            print(f"[Supporters] Failed to read channel history: {e}")
+            messages = []
+
+        found_titles = {}
+        for m in messages:
+            if m.embeds and m.embeds[0].title:
+                found_titles[m.embeds[0].title] = m
+
         updated = False
 
         for title, data in self.embeds_config.items():
@@ -75,6 +86,12 @@ class Supporters(commands.Cog):
                 try:
                     msg = await channel.fetch_message(data["message_id"])
                 except discord.NotFound:
+                    msg = None
+                except discord.Forbidden as e:
+                    print(f"[Supporters] Forbidden fetching message {data['message_id']}: {e}")
+                    msg = None
+                except discord.HTTPException as e:
+                    print(f"[Supporters] HTTPException fetching message {data['message_id']}: {e}")
                     msg = None
 
             if not msg:
@@ -86,13 +103,20 @@ class Supporters(commands.Cog):
                     embed = discord.Embed(
                         title=title,
                         description="*(No supporters yet)*",
-                        color=data["color"]
+                        color=data["color"],
                     )
                     if data.get("image_url"):
                         embed.set_image(url=data["image_url"])
-                    msg = await channel.send(embed=embed)
-                    data["message_id"] = msg.id
-                    updated = True
+                    try:
+                        msg = await channel.send(embed=embed)
+                        data["message_id"] = msg.id
+                        updated = True
+                    except discord.Forbidden as e:
+                        print(f"[Supporters] Forbidden sending embed to channel {self.channel_id}: {e}")
+                        continue
+                    except discord.HTTPException as e:
+                        print(f"[Supporters] HTTPException sending embed: {e}")
+                        continue
 
         if updated:
             self.save_message_ids()
@@ -115,14 +139,16 @@ class Supporters(commands.Cog):
         if not message_id:
             return
 
+        # Collect non-bot members from the configured roles
         members = set()
         for role_name in data["roles"]:
             role = discord.utils.get(guild.roles, name=role_name)
             if role:
+                # Note: role.members requires Intents.members enabled (portal + code)
                 members.update([m for m in role.members if not m.bot])
 
         members_list = [f"- {m.mention}" for m in sorted(members, key=lambda x: x.name.lower())]
-        members_text = "\n".join(members_list) or "*(No supporters yet)*"
+        members_text = "\n".join(members_list) if members_list else "*(No supporters yet)*"
 
         # Truncate to stay under 4096 chars
         if len(members_text) > 4000:
@@ -136,13 +162,23 @@ class Supporters(commands.Cog):
             msg = await channel.fetch_message(message_id)
             await msg.edit(embed=embed)
         except discord.NotFound:
-            new_msg = await channel.send(embed=embed)
-            data["message_id"] = new_msg.id
-            self.save_message_ids()
+            try:
+                new_msg = await channel.send(embed=embed)
+                data["message_id"] = new_msg.id
+                self.save_message_ids()
+            except discord.Forbidden as e:
+                print(f"[Supporters] Forbidden sending replacement embed: {e}")
+            except discord.HTTPException as e:
+                print(f"[Supporters] HTTPException sending replacement embed: {e}")
+        except discord.Forbidden as e:
+            print(f"[Supporters] Forbidden editing message {message_id}: {e}")
+        except discord.HTTPException as e:
+            print(f"[Supporters] HTTPException editing message {message_id}: {e}")
 
     # ---------- EVENTS ----------
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        # Requires Intents.members to fire
         before_roles = {r.name for r in before.roles}
         after_roles = {r.name for r in after.roles}
         changed = before_roles ^ after_roles
@@ -152,11 +188,13 @@ class Supporters(commands.Cog):
 
     # ---------- SLASH COMMAND ----------
     @app_commands.command(name="refresh_supporters", description="Manually refresh the supporter embeds.")
+    @app_commands.default_permissions(manage_guild=True)  # controls visibility in the client
+    @app_commands.checks.has_permissions(manage_guild=True)  # runtime gate (optional)
     async def refresh_supporters(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         await self.update_all_embeds()
         await interaction.followup.send("✅ Supporter embeds refreshed!", ephemeral=True)
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Supporters(bot))

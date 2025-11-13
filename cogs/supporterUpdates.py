@@ -99,33 +99,29 @@ class SupportersList(commands.Cog):
             msg_id = self.message_ids[key]
 
             if msg_id is None:
-                # First-time creation
                 msg = await channel.send(embed=embed)
                 self.message_ids[key] = msg.id
                 continue
 
-            # Try editing
             try:
                 msg = await channel.fetch_message(msg_id)
                 await msg.edit(embed=embed)
             except discord.NotFound:
-                # If deleted, recreate
                 msg = await channel.send(embed=embed)
                 self.message_ids[key] = msg.id
 
     # ---------------------------
-    # Listeners: trigger auto-refresh
+    # 🔥 NEW FIXED LISTENER
     # ---------------------------
-
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        before_roles = set(before.roles)
-        after_roles = set(after.roles)
+    async def on_member_role_update(self, before, after):
+        before_set = {r.name for r in before.roles}
+        after_set = {r.name for r in after.roles}
 
         tracked = {ROLE_ULTRA, ROLE_TOP, ROLE_BOOSTER, ROLE_SUPPORTER}
 
-        # If ANY tracked role was gained or lost → refresh immediately
-        if any((r.name in tracked) for r in (before_roles ^ after_roles)):
+        # If any tracked roles changed, restart the updater
+        if tracked & (before_set ^ after_set):
             self.update_supporter_lists.restart()
 
     @commands.Cog.listener()

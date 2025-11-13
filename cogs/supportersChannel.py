@@ -5,7 +5,7 @@ from discord import app_commands
 class Supporters(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.channel_id = 123456789012345678  # replace with your channel ID
+        self.channel_id = 1438517684470939829  # replace with your channel ID
 
     async def cog_load(self):
         await self.bot.wait_until_ready()

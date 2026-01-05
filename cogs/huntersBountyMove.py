@@ -30,12 +30,12 @@ class WeeklyHuntersBountyEmbed(commands.Cog):
             textToShow = "A large number of bounties for us in this sector. Enjoy!"
 
         embed = discord.Embed(
-            title="Hunter's Bounty has jumped to a new star system!",
+            title="Huntress of the Stars has jumped to a new star system!",
             description=textToShow,
             color=discord.Color.gold()
         )
         embed.set_image(url="https://64.media.tumblr.com/1f3b93c4af348a984598df1931311dc6/bcb287e54fc302cd-6d/s540x810/d6724055a9d1b36393c1ef95ad51d329d7edbbe7.gif")
-        embed.set_footer(text="Hunter's Bounty is 'out of time', which means that you can be here at any time, even during bounties. You can RP it as being connected using a hologram.")
+        embed.set_footer(text="Huntress of the Stars is 'out of time', which means that you can be here at any time, even during bounties. You can RP it as being connected using a hologram.")
         return embed
 
     def is_time_to_send(self):
